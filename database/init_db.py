@@ -13,7 +13,13 @@ import logging
 
 from database.base import Base
 from database.engine import get_engine
-from database.models import User  # noqa: F401  — регистрирует модель в metadata
+from database.models import (  # noqa: F401  — регистрирует модели в metadata
+    MBankAccount,
+    MBankOrder,
+    MBankRawEmail,
+    MBankTransaction,
+    User,
+)
 
 logger = logging.getLogger(__name__)
 

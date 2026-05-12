@@ -5,3 +5,11 @@ python-dotenv>=1.0
 SQLAlchemy[asyncio]>=2.0
 aiomysql>=0.2.0
 cryptography>=42.0
+
+# MBanks (IMAP + AI парсинг писем + матчинг ордеров)
+aioimaplib>=1.0
+python-socks[asyncio]>=2.4
+httpx>=0.27
+groq>=0.13
+openai>=1.50
+anthropic>=0.40

@@ -1,3 +1,3 @@
-from database.repositories import users
+from database.repositories import payments, users
 
-__all__ = ["users"]
+__all__ = ["users", "payments"]
