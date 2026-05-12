@@ -12,6 +12,7 @@ def main_menu_keyboard(language_code: str, user_id: int, admin_telegram_id: int 
         casino_text = "🎰 Казино 🎰"
 
     builder.add(InlineKeyboardButton(text=t("btn_cabinet", lang), callback_data="menu:cabinet"))
+    builder.add(InlineKeyboardButton(text=t("btn_topup", lang), callback_data="menu:topup"))
     builder.add(InlineKeyboardButton(text=t("btn_signup", lang), callback_data="menu:signup"))
     builder.add(InlineKeyboardButton(text=t("btn_play_21_bot", lang), callback_data="menu:play21bot"))
     builder.add(InlineKeyboardButton(text=casino_text, callback_data="menu:casino"))
