@@ -8,7 +8,8 @@ from aiogram.enums import ParseMode
 from database.engine import get_session_maker
 from database.init_db import init_db
 from handlers import setup_routers
-from middlewares import DbSessionMiddleware, UserMiddleware
+from middlewares import ActiveBotGameBlockMiddleware, DbSessionMiddleware, UserMiddleware
+from services.games import run_games_background_loop
 from services.payments.ai_clients.factory import create_ai_client
 from services.payments.monitor_manager import MonitorManager
 from settings import get_settings
@@ -38,6 +39,7 @@ async def main() -> None:
     for event in (dp.message, dp.callback_query):
         event.middleware(DbSessionMiddleware(session_maker))
         event.middleware(UserMiddleware())
+        event.middleware(ActiveBotGameBlockMiddleware())
 
     # ── MBanks (IMAP + AI) ────────────────────────────────────────────────────
     mbanks_manager: MonitorManager | None = None
@@ -65,6 +67,7 @@ async def main() -> None:
     async def _on_startup() -> None:
         if mbanks_manager is not None:
             await mbanks_manager.start_all()
+        asyncio.create_task(run_games_background_loop(bot, session_maker))
 
     async def _on_shutdown() -> None:
         if mbanks_manager is not None:

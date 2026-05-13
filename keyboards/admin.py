@@ -23,6 +23,36 @@ def admin_menu_keyboard(language_code: str) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
+def admin_games_keyboard(language_code: str) -> InlineKeyboardMarkup:
+    """Подменю 'Игры'."""
+    lang = language_code
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_create_game", lang),
+            callback_data="admin:games:create",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_active_games", lang),
+            callback_data="admin:games:active",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_past_games", lang),
+            callback_data="admin:games:past",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+    )
+    return builder.as_markup()
+
+
 def admin_bot_settings_keyboard(language_code: str) -> InlineKeyboardMarkup:
     """Подменю 'Настройки бота'."""
     lang = language_code
@@ -40,11 +70,40 @@ def admin_bot_settings_keyboard(language_code: str) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
+def admin_game21_fees_keyboard(language_code: str) -> InlineKeyboardMarkup:
+    """Подменю комиссий игры 21."""
+    lang = language_code
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_game21_fee_btn_bot", lang),
+            callback_data="admin:fees:21:bot",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_game21_fee_btn_users", lang),
+            callback_data="admin:fees:21:users",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings:fees"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+    )
+    return builder.as_markup()
+
+
 def admin_fees_keyboard(language_code: str) -> InlineKeyboardMarkup:
     """Подменю 'Настройка комиссий'."""
     lang = language_code
     builder = InlineKeyboardBuilder()
 
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_game21_fees", lang),
+            callback_data="admin:fees:21",
+        )
+    )
     builder.row(
         InlineKeyboardButton(
             text=t("admin_btn_withdraw_fee", lang),

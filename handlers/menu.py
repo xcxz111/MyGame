@@ -1,10 +1,12 @@
 """Обработчики кнопок главного меню."""
 
 from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
+from database.repositories import app_chats as app_chats_repo
 from keyboards import language_keyboard, main_menu_keyboard
 from locales.texts import get_lang, t
 from settings import get_settings
@@ -33,13 +35,17 @@ async def on_menu_lang(
 
 @router.callback_query(F.data == "menu:main", F.message.chat.type == "private")
 async def on_menu_main(
-    callback: CallbackQuery, session: AsyncSession, user: User
+    callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext
 ) -> None:
     """Возврат в главное меню."""
+    await state.clear()
     settings = get_settings()
     lang = _user_lang(user, callback)
+    menu_chats = await app_chats_repo.list_for_main_menu(session)
     await callback.message.edit_text(
         build_welcome_text(lang, user.user_id, user.balance),
-        reply_markup=main_menu_keyboard(lang, user.user_id, settings.admin_id),
+        reply_markup=main_menu_keyboard(
+            lang, user.user_id, settings.admin_id, menu_chats=menu_chats
+        ),
     )
     await callback.answer()

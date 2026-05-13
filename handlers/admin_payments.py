@@ -19,9 +19,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
 from database.models.payments.account import MBankAccount
-from database.repositories import fees as fees_repo
+from database.repositories import game21_settings as g21_repo
 from database.repositories.payments import accounts as accounts_repo
-from keyboards import admin_fees_keyboard
+from keyboards import admin_fees_keyboard, admin_game21_fees_keyboard
 from services.payments import MonitorManager
 from keyboards.admin_payments import (
     BANK_LABELS,
@@ -38,6 +38,7 @@ from locales.texts import get_lang, t
 from permissions import is_admin
 from settings import get_settings
 from states.admin_payments import MBankAccountState, WithdrawFeeState
+from states.game21 import Game21FeeState
 
 logger = logging.getLogger(__name__)
 
@@ -310,6 +311,95 @@ async def on_withdraw_fee_input(
     await message.answer(
         t("admin_fees_title", lang),
         reply_markup=admin_fees_keyboard(lang),
+    )
+
+
+# ── Game 21 fees ──────────────────────────────────────────────────────────────
+
+
+@router.callback_query(F.data == "admin:fees:21", F.message.chat.type == "private")
+async def on_game21_fees_menu(
+    callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    lang = _resolve_lang(user, callback)
+    if await _deny_if_not_admin_cb(callback, user, lang):
+        return
+    await state.clear()
+    s = await g21_repo.get_settings(session)
+    await callback.message.edit_text(
+        t("admin_fees_21_title", lang).format(
+            bot=_fmt_percent(s.commission_bot_percent),
+            users=_fmt_percent(s.commission_users_percent),
+        ),
+        reply_markup=admin_game21_fees_keyboard(lang),
+    )
+    await callback.answer()
+
+
+@router.callback_query(
+    F.data.in_({"admin:fees:21:bot", "admin:fees:21:users"}), F.message.chat.type == "private"
+)
+async def on_game21_fee_pick(
+    callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    lang = _resolve_lang(user, callback)
+    if await _deny_if_not_admin_cb(callback, user, lang):
+        return
+    s = await g21_repo.get_settings(session)
+    target = "bot" if callback.data.endswith(":bot") else "users"
+    cur = (
+        s.commission_bot_percent if target == "bot" else s.commission_users_percent
+    ) or Decimal("0")
+    await state.set_state(Game21FeeState.waiting_percent)
+    await state.update_data(fee21_target=target)
+    key = (
+        "admin_game21_fee_bot_title" if target == "bot" else "admin_game21_fee_users_title"
+    )
+    await callback.message.edit_text(
+        t(key, lang).format(percent=_fmt_percent(cur)),
+    )
+    await callback.answer()
+
+
+@router.message(StateFilter(Game21FeeState.waiting_percent), F.chat.type == "private")
+async def on_game21_fee_input(
+    message: Message, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    lang = _resolve_lang(user, message)
+    if await _deny_if_not_admin_msg(message, user, lang):
+        await state.clear()
+        return
+    data = await state.get_data()
+    target = data.get("fee21_target")
+    raw = (message.text or "").strip().replace(",", ".").rstrip("%").strip()
+    try:
+        percent = Decimal(raw)
+    except (InvalidOperation, ValueError):
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    if percent < 0 or percent > 100:
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    percent = percent.quantize(Decimal("0.01"))
+    if target == "bot":
+        await g21_repo.set_commission_bot(session, percent)
+    elif target == "users":
+        await g21_repo.set_commission_users(session, percent)
+    else:
+        await state.clear()
+        return
+    await session.commit()
+    await state.clear()
+    await message.answer(
+        t("admin_game21_fee_updated", lang).format(percent=_fmt_percent(percent))
+    )
+    s = await g21_repo.get_settings(session)
+    await message.answer(
+        t("admin_fees_21_title", lang).format(
+            bot=_fmt_percent(s.commission_bot_percent),
+            users=_fmt_percent(s.commission_users_percent),
+        ),
+        reply_markup=admin_game21_fees_keyboard(lang),
     )
 
 

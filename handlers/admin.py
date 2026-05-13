@@ -1,6 +1,7 @@
 """Хендлеры админки."""
 
 from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,12 +32,13 @@ async def _deny_if_not_admin(callback: CallbackQuery, user: User, lang: str) -> 
 
 @router.callback_query(F.data == "menu:admin", F.message.chat.type == "private")
 async def on_menu_admin(
-    callback: CallbackQuery, session: AsyncSession, user: User
+    callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext
 ) -> None:
     lang = _resolve_lang(user, callback)
     if await _deny_if_not_admin(callback, user, lang):
         return
 
+    await state.clear()
     await callback.message.edit_text(
         t("admin_title", lang),
         reply_markup=admin_menu_keyboard(lang),
@@ -46,12 +48,13 @@ async def on_menu_admin(
 
 @router.callback_query(F.data == "admin:settings", F.message.chat.type == "private")
 async def on_admin_settings(
-    callback: CallbackQuery, session: AsyncSession, user: User
+    callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext
 ) -> None:
     lang = _resolve_lang(user, callback)
     if await _deny_if_not_admin(callback, user, lang):
         return
 
+    await state.clear()
     await callback.message.edit_text(
         t("admin_settings_title", lang),
         reply_markup=admin_bot_settings_keyboard(lang),

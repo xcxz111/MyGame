@@ -11,15 +11,29 @@
 import asyncio
 import logging
 
+from sqlalchemy import inspect, text
+
 from database.base import Base
 from database.engine import get_engine
 from database.models import (  # noqa: F401  — регистрирует модели в metadata
+    AppChat,
+    AppChatAllowedTopic,
     Fee,
+    ForumTopic,
+    Game,
+    Game21BotRound,
+    Game21BotSession,
+    Game21Settings,
+    Game21UsersRound,
+    Game21UsersSession,
+    GameParticipant,
     MBankAccount,
     MBankOrder,
     MBankRawEmail,
     MBankTransaction,
     PaymentLog,
+    Prize,
+    Throw,
     User,
     Withdrawal,
 )
@@ -27,11 +41,117 @@ from database.models import (  # noqa: F401  — регистрирует мод
 logger = logging.getLogger(__name__)
 
 
+def _migrate_game21_to_game_bot_schema(connection) -> None:
+    """Убирает legacy-таблицы матчей; настройки всегда в `game21_settings` (переименование из `game21_bot_settings` при необходимости)."""
+    insp = inspect(connection)
+    tables = set(insp.get_table_names())
+    if "game21_match_moves" in tables:
+        connection.execute(text("DROP TABLE IF EXISTS `game21_match_moves`"))
+        tables.discard("game21_match_moves")
+    if "game21_matches" in tables:
+        connection.execute(text("DROP TABLE IF EXISTS `game21_matches`"))
+        tables.discard("game21_matches")
+
+    if "game21_bot_settings" in tables and "game21_settings" not in tables:
+        connection.execute(text("RENAME TABLE `game21_bot_settings` TO `game21_settings`"))
+
+    insp = inspect(connection)
+    if "game21_settings" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("game21_settings")}
+    if "enabled_bot" in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `game21_settings` CHANGE COLUMN `enabled_bot` `enabled` "
+                "SMALLINT NOT NULL DEFAULT 0"
+            )
+        )
+    if "commission_bot_percent" in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `game21_settings` CHANGE COLUMN `commission_bot_percent` "
+                "`commission_percent` DECIMAL(5,2) NOT NULL DEFAULT 0.00"
+            )
+        )
+    insp = inspect(connection)
+    cols = {c["name"] for c in insp.get_columns("game21_settings")}
+    for col, ddl in (
+        ("rules_bot_text", "MEDIUMTEXT NULL"),
+        ("rules_users_text", "MEDIUMTEXT NULL"),
+    ):
+        if col not in cols:
+            connection.execute(text(f"ALTER TABLE `game21_settings` ADD COLUMN `{col}` {ddl}"))
+
+
+def _ensure_app_chats_button_titles(connection) -> None:
+    """Добавляет колонки подписей кнопки по языкам в уже существующую таблицу `app_chats`."""
+    insp = inspect(connection)
+    if "app_chats" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("app_chats")}
+    for col, ddl in (
+        ("button_title_ru", "VARCHAR(200) NULL"),
+        ("button_title_en", "VARCHAR(200) NULL"),
+        ("button_title_uk", "VARCHAR(200) NULL"),
+        ("button_title_pl", "VARCHAR(200) NULL"),
+    ):
+        if col not in cols:
+            connection.execute(text(f"ALTER TABLE `app_chats` ADD COLUMN `{col}` {ddl}"))
+            cols.add(col)
+
+
+def _ensure_games_message_thread_id(connection) -> None:
+    insp = inspect(connection)
+    if "games" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("games")}
+    if "message_thread_id" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `games` ADD COLUMN `message_thread_id` INT NULL "
+                "COMMENT 'Тема форума (message_thread_id)'"
+            )
+        )
+
+
+def _ensure_games_announcement_general(connection) -> None:
+    insp = inspect(connection)
+    if "games" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("games")}
+    if "announcement_message_id_general" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `games` ADD COLUMN `announcement_message_id_general` BIGINT NULL "
+                "COMMENT 'Дубль анонса в общем чате форума'"
+            )
+        )
+
+
+def _ensure_app_chats_game21_users(connection) -> None:
+    insp = inspect(connection)
+    if "app_chats" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("app_chats")}
+    if "game21_users_enabled" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `app_chats` ADD COLUMN `game21_users_enabled` SMALLINT NOT NULL "
+                "DEFAULT 0 COMMENT 'PvP 21 в чате'"
+            )
+        )
+
+
 async def init_db() -> None:
     """Создаёт таблицы по моделям. Движок не закрывает — он переиспользуется ботом."""
     engine = get_engine()
     async with engine.begin() as conn:
+        await conn.run_sync(_migrate_game21_to_game_bot_schema)
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_ensure_app_chats_button_titles)
+        await conn.run_sync(_ensure_app_chats_game21_users)
+        await conn.run_sync(_ensure_games_message_thread_id)
+        await conn.run_sync(_ensure_games_announcement_general)
 
 
 async def _standalone() -> None:

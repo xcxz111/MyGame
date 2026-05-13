@@ -20,6 +20,9 @@ class PaymentLogMethod:
     WITHDRAW_REFUND = "withdraw_refund"  # возврат денег при отмене вывода
     TRANSFER_IN = "transfer_in"   # входящий перевод от другого юзера (на будущее)
     TRANSFER_OUT = "transfer_out" # исходящий перевод (на будущее)
+    GAME_ENTRY = "game_entry"     # взнос за участие в игре (платная игра)
+    GAME_ENTRY_REFUND = "game_entry_refund"  # возврат взноса (отмена игры / выход до старта)
+    GAME_PRIZE = "game_prize"     # выигрыш по месту (method + place в отдельном поле не кладём — см. amount)
     # для игр сюда будем класть код/название: 'game:21', 'game:casino', и т.п.
 
 
