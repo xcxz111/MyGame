@@ -34,7 +34,10 @@ class MonitorManager:
         self._settings = settings
         self._bot = bot
         self._handler = BankTransactionHandler(
-            session_maker=session_maker, ai_client=ai_client, bot=bot
+            session_maker=session_maker,
+            ai_client=ai_client,
+            bot=bot,
+            settings=settings,
         )
         self._monitors: dict[int, AccountMonitor] = {}
         self._daily_reset_task: Optional[asyncio.Task] = None

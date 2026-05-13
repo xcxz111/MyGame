@@ -30,7 +30,7 @@ def _status_emoji(account: MBankAccount) -> str:
 def payments_list_keyboard(
     accounts: list[MBankAccount], language_code: str
 ) -> InlineKeyboardMarkup:
-    """Список аккаунтов + «Добавить» + Назад/Главная."""
+    """Список аккаунтов + «Добавить» + «Комиссия вывода» + Назад/Главная."""
     lang = language_code
     builder = InlineKeyboardBuilder()
     for acc in accounts:

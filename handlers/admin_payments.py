@@ -19,7 +19,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
 from database.models.payments.account import MBankAccount
+from database.repositories import fees as fees_repo
 from database.repositories.payments import accounts as accounts_repo
+from keyboards import admin_fees_keyboard
 from services.payments import MonitorManager
 from keyboards.admin_payments import (
     BANK_LABELS,
@@ -35,7 +37,7 @@ from keyboards.admin_payments import (
 from locales.texts import get_lang, t
 from permissions import is_admin
 from settings import get_settings
-from states.admin_payments import MBankAccountState
+from states.admin_payments import MBankAccountState, WithdrawFeeState
 
 logger = logging.getLogger(__name__)
 
@@ -251,6 +253,72 @@ async def on_deactivate(
         await mbanks_manager.remove_account(account_id)
     await _render_account_cb(callback, session, account_id, lang)
     await callback.answer("⏹ Остановлен")
+
+
+# ── Withdraw fee ──────────────────────────────────────────────────────────────
+
+
+@router.callback_query(
+    F.data == "admin:fees:withdraw", F.message.chat.type == "private"
+)
+async def on_withdraw_fee_open(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    user: User,
+    state: FSMContext,
+) -> None:
+    lang = _resolve_lang(user, callback)
+    if await _deny_if_not_admin_cb(callback, user, lang):
+        return
+    percent = await fees_repo.get_withdraw_percent(session)
+    await state.set_state(WithdrawFeeState.waiting_percent)
+    percent_str = _fmt_percent(percent)
+    await callback.message.edit_text(
+        t("admin_withdraw_fee_title", lang).format(percent=percent_str),
+    )
+    await callback.answer()
+
+
+@router.message(
+    StateFilter(WithdrawFeeState.waiting_percent), F.chat.type == "private"
+)
+async def on_withdraw_fee_input(
+    message: Message, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    lang = _resolve_lang(user, message)
+    if await _deny_if_not_admin_msg(message, user, lang):
+        await state.clear()
+        return
+
+    raw = (message.text or "").strip().replace(",", ".").rstrip("%").strip()
+    try:
+        percent = Decimal(raw)
+    except (InvalidOperation, ValueError):
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    if percent < 0 or percent > 100:
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+
+    percent = percent.quantize(Decimal("0.01"))
+    await fees_repo.set_withdraw_percent(session, percent)
+    await session.commit()
+    await state.clear()
+    await message.answer(
+        t("admin_withdraw_fee_updated", lang).format(percent=_fmt_percent(percent))
+    )
+    await message.answer(
+        t("admin_fees_title", lang),
+        reply_markup=admin_fees_keyboard(lang),
+    )
+
+
+def _fmt_percent(percent: Decimal) -> str:
+    if percent is None:
+        return "0"
+    if percent == percent.to_integral_value():
+        return str(int(percent))
+    return f"{percent:f}".rstrip("0").rstrip(".")
 
 
 # ── Rescan recent emails ─────────────────────────────────────────────────────

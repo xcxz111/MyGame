@@ -14,11 +14,14 @@ import logging
 from database.base import Base
 from database.engine import get_engine
 from database.models import (  # noqa: F401  — регистрирует модели в metadata
+    Fee,
     MBankAccount,
     MBankOrder,
     MBankRawEmail,
     MBankTransaction,
+    PaymentLog,
     User,
+    Withdrawal,
 )
 
 logger = logging.getLogger(__name__)

@@ -13,15 +13,18 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+from database.models.payment_log import PaymentLogMethod
 from database.models.payments.account import MBankAccount
 from database.models.payments.order import MBankOrder, MBankOrderStatus
 from database.models.payments.raw_email import MBankRawEmail
 from database.models.payments.transaction import MBankTransaction
 from database.models.user import User
+from database.repositories import payment_logs as payment_logs_repo
 from locales.texts import t
 from services.payments import limit_service
 from services.payments.ai_clients.base import AIClient
 from services.payments.ai_validator import validate_and_extract
+from settings import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +46,12 @@ class BankTransactionHandler:
         session_maker: async_sessionmaker[AsyncSession],
         ai_client: AIClient,
         bot: Optional[Bot] = None,
+        settings: Optional[Settings] = None,
     ) -> None:
         self._session_maker = session_maker
         self._ai_client = ai_client
         self._bot = bot
+        self._settings = settings
 
     async def on_new_message(
         self, account_email: str, uid: int, message: dict[str, Any]
@@ -216,15 +221,23 @@ class BankTransactionHandler:
             credited_user_id: int | None = None
             credited_amount = txn.amount or order.amount
             user_lang: str | None = None
+            credited_user: User | None = None
             if order.user_id is not None and credited_amount and credited_amount > 0:
-                await session.execute(
-                    update(User)
-                    .where(User.user_id == order.user_id)
-                    .values(balance=User.balance + credited_amount)
-                )
                 credited_user = await session.get(User, order.user_id)
-                user_lang = credited_user.language_code if credited_user else None
-                credited_user_id = order.user_id
+                if credited_user is not None:
+                    credited_user.balance = (
+                        credited_user.balance or Decimal("0.00")
+                    ) + credited_amount
+                    await session.flush()
+                    await payment_logs_repo.log(
+                        session,
+                        user_id=order.user_id,
+                        method=PaymentLogMethod.TOPUP,
+                        amount=credited_amount,
+                        balance_after=credited_user.balance,
+                    )
+                    user_lang = credited_user.language_code
+                    credited_user_id = order.user_id
 
             order.status = MBankOrderStatus.COMPLETED
             order.updated_at = datetime.now(timezone.utc)
@@ -261,7 +274,49 @@ class BankTransactionHandler:
                     exc,
                 )
 
+            # Уведомление в админ-чат
+            await self._notify_admin_chat(credited_user, credited_amount, order_id)
+
         return order
+
+    async def _notify_admin_chat(
+        self,
+        user: User | None,
+        amount: Decimal,
+        order_id: str,
+    ) -> None:
+        if (
+            self._bot is None
+            or self._settings is None
+            or self._settings.admin_chat is None
+        ):
+            return
+
+        if user is not None:
+            mention = f'<a href="tg://user?id={user.user_id}">'
+            display_name = user.name or user.user_name or str(user.user_id)
+            mention += f"{display_name}</a>"
+            username = f" (@{user.user_name})" if user.user_name else ""
+            user_line = f"👤 {mention}{username}\n🆔 <code>{user.user_id}</code>"
+        else:
+            user_line = "👤 —"
+
+        text = (
+            "💰 <b>Новое пополнение</b>\n\n"
+            f"{user_line}\n"
+            f"💵 Сумма: <b>{amount} PLN</b>\n"
+            f"🧾 Ордер: <code>{order_id}</code>"
+        )
+
+        try:
+            await self._bot.send_message(self._settings.admin_chat, text)
+        except Exception as exc:
+            logger.warning(
+                "Failed to notify admin_chat=%s about order %s: %s",
+                self._settings.admin_chat,
+                order_id,
+                exc,
+            )
 
     async def _update_account_balance(
         self, account_email: str, balance: Decimal

@@ -5,7 +5,11 @@ from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
-from keyboards import admin_bot_settings_keyboard, admin_menu_keyboard
+from keyboards import (
+    admin_bot_settings_keyboard,
+    admin_fees_keyboard,
+    admin_menu_keyboard,
+)
 from locales.texts import get_lang, t
 from permissions import is_admin
 from settings import get_settings
@@ -51,5 +55,22 @@ async def on_admin_settings(
     await callback.message.edit_text(
         t("admin_settings_title", lang),
         reply_markup=admin_bot_settings_keyboard(lang),
+    )
+    await callback.answer()
+
+
+@router.callback_query(
+    F.data == "admin:settings:fees", F.message.chat.type == "private"
+)
+async def on_admin_fees(
+    callback: CallbackQuery, session: AsyncSession, user: User
+) -> None:
+    lang = _resolve_lang(user, callback)
+    if await _deny_if_not_admin(callback, user, lang):
+        return
+
+    await callback.message.edit_text(
+        t("admin_fees_title", lang),
+        reply_markup=admin_fees_keyboard(lang),
     )
     await callback.answer()

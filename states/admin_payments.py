@@ -8,3 +8,7 @@ class MBankAccountState(StatesGroup):
     edit_proxy = State()
     edit_limit = State()
     edit_blik = State()
+
+
+class WithdrawFeeState(StatesGroup):
+    waiting_percent = State()

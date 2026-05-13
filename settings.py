@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     bot_token: str
     admin_id: int | None = None
+    admin_chat: int | None = None
 
     # ---- MySQL ----
     mysql_host: str = "localhost"

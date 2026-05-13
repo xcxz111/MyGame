@@ -29,11 +29,30 @@ def admin_bot_settings_keyboard(language_code: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.row(InlineKeyboardButton(text=t("admin_btn_payments", lang), callback_data="admin:settings:payments"))
+    builder.row(InlineKeyboardButton(text=t("admin_btn_fees", lang), callback_data="admin:settings:fees"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_chats", lang), callback_data="admin:settings:chats"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_forbidden_words", lang), callback_data="admin:settings:words"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_admins", lang), callback_data="admin:settings:admins"))
     builder.row(
         InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+    )
+    return builder.as_markup()
+
+
+def admin_fees_keyboard(language_code: str) -> InlineKeyboardMarkup:
+    """Подменю 'Настройка комиссий'."""
+    lang = language_code
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_withdraw_fee", lang),
+            callback_data="admin:fees:withdraw",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings"),
         InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
     )
     return builder.as_markup()
