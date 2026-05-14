@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from sqlalchemy import delete, select
+from sqlalchemy import case, delete, func, select
 from sqlalchemy.dialects.mysql import insert as mysql_insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -240,3 +240,67 @@ async def upsert_users_session_gb(
             )
     except Exception:
         logger.exception("game21_history: upsert_users_session_gb failed token=%s", pvp_session_token)
+
+
+async def get_admin_stats(session: AsyncSession) -> dict[str, Decimal | int]:
+    bot_row = (
+        await session.execute(
+            select(
+                func.count(Game21BotSession.id).label("bot_total"),
+                func.coalesce(
+                    func.sum(case((Game21BotSession.result == "lose", 1), else_=0)),
+                    0,
+                ).label("bot_won_count"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (Game21BotSession.result == "lose", -Game21BotSession.net_result),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ).label("bot_won_sum"),
+                func.coalesce(
+                    func.sum(case((Game21BotSession.result == "win", 1), else_=0)),
+                    0,
+                ).label("bot_lost_count"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (Game21BotSession.result == "win", Game21BotSession.net_result),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ).label("bot_lost_sum"),
+                func.coalesce(
+                    func.sum(case((Game21BotSession.result == "draw", 1), else_=0)),
+                    0,
+                ).label("bot_draw_count"),
+                func.coalesce(func.sum(-Game21BotSession.net_result), 0).label("bot_profit_sum"),
+            ).where(Game21BotSession.status == "finish")
+        )
+    ).one()
+    pvp_row = (
+        await session.execute(
+            select(
+                func.count(Game21UsersSession.id).label("pvp_total"),
+                func.coalesce(func.sum(Game21UsersSession.commission_amount), 0).label(
+                    "pvp_commission_sum"
+                ),
+            )
+        )
+    ).one()
+    return {
+        "bot_total": int(bot_row.bot_total or 0),
+        "bot_won_count": int(bot_row.bot_won_count or 0),
+        "bot_won_sum": Decimal(str(bot_row.bot_won_sum or "0")).quantize(Decimal("0.01")),
+        "bot_lost_count": int(bot_row.bot_lost_count or 0),
+        "bot_lost_sum": Decimal(str(bot_row.bot_lost_sum or "0")).quantize(Decimal("0.01")),
+        "bot_draw_count": int(bot_row.bot_draw_count or 0),
+        "bot_profit_sum": Decimal(str(bot_row.bot_profit_sum or "0")).quantize(Decimal("0.01")),
+        "pvp_total": int(pvp_row.pvp_total or 0),
+        "pvp_commission_sum": Decimal(str(pvp_row.pvp_commission_sum or "0")).quantize(
+            Decimal("0.01")
+        ),
+    }

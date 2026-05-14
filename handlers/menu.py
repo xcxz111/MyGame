@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
 from database.repositories import app_chats as app_chats_repo
+from database.repositories import game21_settings as g21_repo
+from database.repositories import slot as slot_repo
 from keyboards import language_keyboard, main_menu_keyboard
 from locales.texts import get_lang, t
 from settings import get_settings
@@ -37,15 +39,27 @@ async def on_menu_lang(
 async def on_menu_main(
     callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext
 ) -> None:
-    """Возврат в главное меню."""
+    """Возврат в главное меню: как в Game_bot, удаляем источник и шлём меню заново."""
     await state.clear()
     settings = get_settings()
     lang = _user_lang(user, callback)
     menu_chats = await app_chats_repo.list_for_main_menu(session)
-    await callback.message.edit_text(
-        build_welcome_text(lang, user.user_id, user.balance),
+    show_game21 = await g21_repo.any_game21_enabled(session)
+    show_slot = await slot_repo.is_enabled(session)
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+    await callback.bot.send_message(
+        chat_id=callback.from_user.id,
+        text=build_welcome_text(lang, user.user_id, user.balance),
         reply_markup=main_menu_keyboard(
-            lang, user.user_id, settings.admin_id, menu_chats=menu_chats
+            lang,
+            user.user_id,
+            settings.admin_id,
+            menu_chats=menu_chats,
+            show_game21=show_game21,
+            show_slot=show_slot,
         ),
     )
     await callback.answer()

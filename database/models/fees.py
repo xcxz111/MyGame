@@ -24,10 +24,16 @@ class Fee(Base):
         server_default="0.00",
         comment="Комиссия за вывод средств, в процентах от запрошенной суммы",
     )
+    slot_percent: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2),
+        default=Decimal("0.00"),
+        server_default="0.00",
+        comment="Комиссия игры Слот, в процентах от выплаты",
+    )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
     )
 
     def __repr__(self) -> str:
-        return f"<Fee id={self.id} withdraw_percent={self.withdraw_percent}>"
+        return f"<Fee id={self.id} withdraw_percent={self.withdraw_percent} slot_percent={self.slot_percent}>"

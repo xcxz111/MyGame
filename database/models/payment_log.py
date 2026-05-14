@@ -23,7 +23,7 @@ class PaymentLogMethod:
     GAME_ENTRY = "game_entry"     # взнос за участие в игре (платная игра)
     GAME_ENTRY_REFUND = "game_entry_refund"  # возврат взноса (отмена игры / выход до старта)
     GAME_PRIZE = "game_prize"     # выигрыш по месту (method + place в отдельном поле не кладём — см. amount)
-    # для игр сюда будем класть код/название: 'game:21', 'game:casino', и т.п.
+    # для игр сюда будем класть код/название: 'game:21', 'game:slot', и т.п.
 
 
 class PaymentLog(Base):

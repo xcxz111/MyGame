@@ -20,10 +20,12 @@ from database.models.game import Game, GameStatus, GameType
 from database.models.payment_log import PaymentLogMethod
 from database.models.user import User
 from database.repositories import app_chats as app_chats_repo
+from database.repositories import game21_settings as g21_repo
 from database.repositories import game_participants as gp_repo
 from database.repositories import games as games_repo
 from database.repositories import payment_logs as payment_logs_repo
 from database.repositories import prizes as prizes_repo
+from database.repositories import slot as slot_repo
 from database.repositories import throws as throws_repo
 from database.repositories import users as users_repo
 from keyboards.main_menu import main_menu_keyboard
@@ -186,6 +188,8 @@ async def send_5min_reminders(bot: Bot, session_maker: SessionMaker) -> None:
     async with session_maker() as session:
         games = await games_repo.list_for_5min_reminder(session, now)
         menu_chats = await app_chats_repo.list_for_main_menu(session)
+        show_game21 = await g21_repo.any_game21_enabled(session)
+        show_slot = await slot_repo.is_enabled(session)
         for game in games:
             try:
                 uids = await gp_repo.list_user_ids(session, game.id)
@@ -212,7 +216,12 @@ async def send_5min_reminders(bot: Bot, session_maker: SessionMaker) -> None:
                         texts[lang],
                         parse_mode=ParseMode.HTML,
                         reply_markup=main_menu_keyboard(
-                            lang, uid, settings.admin_id, menu_chats=menu_chats
+                            lang,
+                            uid,
+                            settings.admin_id,
+                            menu_chats=menu_chats,
+                            show_game21=show_game21,
+                            show_slot=show_slot,
                         ),
                     )
                 except Exception as exc:
@@ -256,6 +265,8 @@ async def _cancel_game_not_enough(
         chat_id = g.chat_id
         ann_thread = g.message_thread_id
         menu_chats = await app_chats_repo.list_for_main_menu(session)
+        show_game21 = await g21_repo.any_game21_enabled(session)
+        show_slot = await slot_repo.is_enabled(session)
         await session.commit()
 
     if ann_id:
@@ -294,7 +305,12 @@ async def _cancel_game_not_enough(
                 text,
                 parse_mode=ParseMode.HTML,
                 reply_markup=main_menu_keyboard(
-                    lang, uid, settings.admin_id, menu_chats=menu_chats
+                    lang,
+                    uid,
+                    settings.admin_id,
+                    menu_chats=menu_chats,
+                    show_game21=show_game21,
+                    show_slot=show_slot,
                 ),
             )
         except Exception as exc:
@@ -1231,6 +1247,8 @@ async def _do_tiebreak_and_winners(
     settings = get_settings()
     async with session_maker() as session:
         menu_chats = await app_chats_repo.list_for_main_menu(session)
+        show_game21 = await g21_repo.any_game21_enabled(session)
+        show_slot = await slot_repo.is_enabled(session)
         prize_rows = await prizes_repo.for_game(session, game_id)
         by_place = {p.place_number: p.amount for p in prize_rows}
         for i in range(min(prize_places, len(ordered))):
@@ -1259,7 +1277,12 @@ async def _do_tiebreak_and_winners(
                     ),
                     parse_mode=ParseMode.HTML,
                     reply_markup=main_menu_keyboard(
-                        ulang, uid, settings.admin_id, menu_chats=menu_chats
+                        ulang,
+                        uid,
+                        settings.admin_id,
+                        menu_chats=menu_chats,
+                        show_game21=show_game21,
+                        show_slot=show_slot,
                     ),
                 )
             except Exception as exc:

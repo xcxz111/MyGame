@@ -88,7 +88,38 @@ TEXTS: dict[str, dict[str, str]] = {
         "btn_signup": "🎮 Записаться на игру 🎯🎳🎲",
         "main_menu_chat_fallback": "💬 Чат",
         "btn_play_21_bot": "♠️♥️Играть в 21♣️♦️",
-        "btn_casino": "🎰 Казино 🎰",
+        "btn_casino": "🎰 Слот 🎰",
+        "slot_enter_bet_with_balance": "Ваш баланс: {balance} PLN\nВведите сумму ставки (например 1):",
+        "slot_rules_block": "Правила и выплаты:\n• 3 одинаковых — x4\n• 2 одинаковых — x1.1\n• Все разные — проигрыш",
+        "slot_bet_invalid": "Неверная сумма ставки. Введите положительное число.",
+        "slot_not_enough_balance": "Недостаточно средств для ставки.",
+        "slot_spin_prompt": "Ваш баланс: {balance} PLN\nСтавка {amount} PLN принята.\nТеперь крутите 🎰",
+        "slot_balance_update_failed": "Не удалось обновить баланс. Попробуйте еще раз.",
+        "slot_combo_three": "3 одинаковых",
+        "slot_combo_two": "2 одинаковых",
+        "slot_combo_none": "все разные",
+        "slot_result_win": "Ваш баланс: {balance} PLN\nРезультат 🎰: {combo}\nСтавка {bet} PLN умножается на x{mult}\nВыплата: {payout} PLN",
+        "slot_result_lose": "Ваш баланс: {balance} PLN\nРезультат 🎰: {combo}\nСтавка {bet} PLN сгорела.",
+        "slot_disabled": "Слот сейчас выключен.",
+        "admin_slot_stats_text": "Слот:\nБОТ выиграл: {bot_won_sum} PLN\nБОТ проиграл: {bot_lost_sum} PLN\nОбщая прибыль БОТа: {bot_profit_sum} PLN",
+        "admin_slot_mode_text": (
+            "🎰 <b>Режим слот</b>\n\n"
+            "{status}\n\n"
+            "-------------------------------------------\n"
+            "Всего игр: {total_games}\n"
+            "уникальных пользователей: {unique_users}\n"
+            "выйграно пользователями: {users_won_sum} PLN\n"
+            "проиграно пользователями: {users_lost_sum} PLN\n"
+            "общая прибыль бота: {bot_profit_sum} PLN\n"
+            "-------------------------------------------"
+        ),
+        "admin_slot_btn_enable": "Включить",
+        "admin_slot_btn_disable": "Выключить",
+        "admin_slot_btn_rules": "Правило",
+        "admin_slot_rules_prompt": "Введите правило для Слота:",
+        "admin_slot_rules_current": "Текущее правило:\n{rules}",
+        "admin_slot_rules_empty": "❌ Правило не может быть пустым. Введите текст правила.",
+        "admin_slot_rules_saved": "✅ Правило Слота сохранено.",
         "btn_admin": "Админка",
         "btn_lang": "🌐",
         "btn_main": "🏠 Главная",
@@ -97,7 +128,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_no_access": "⛔ Нет доступа",
         "admin_btn_games": "🎯 Игры",
         "admin_btn_21": "♠️ 21",
-        "admin_btn_casino": "🎰 Казино",
+        "admin_btn_casino": "🎰 Слот",
         "admin_btn_checkers": "🔴 Шашки",
         "admin_btn_kmb": "🪖 КМБ",
         "admin_btn_stats": "📊 Статистика",
@@ -111,6 +142,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_payments": "💳 Настройка платежей",
         "admin_btn_fees": "💸 Настройка комиссий",
         "admin_btn_withdraw_fee": "💸 Комиссия вывода",
+        "admin_btn_slot_fee": "🎰 Комиссия Слота",
         "admin_fees_title": "💸 <b>Настройка комиссий</b>",
         "admin_pay_title": "<b>MBanks</b> — аккаунты:",
         "admin_pay_empty": "<b>MBanks</b>\nАккаунтов нет.",
@@ -119,6 +151,8 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_withdraw_fee_title": "💸 <b>Комиссия вывода</b>\n\nТекущее значение: <b>{percent}%</b>\n\nВведите новый процент (например <code>5</code> или <code>2.5</code>):",
         "admin_withdraw_fee_invalid": "❌ Неверный формат. Введите число от 0 до 100 (например <code>5</code> или <code>2.5</code>).",
         "admin_withdraw_fee_updated": "✅ Комиссия вывода обновлена: <b>{percent}%</b>",
+        "admin_slot_fee_title": "🎰 <b>Комиссия Слота</b>\n\nТекущее значение: <b>{percent}%</b>\n\nВведите новый процент:",
+        "admin_slot_fee_updated": "✅ Комиссия Слота обновлена: <b>{percent}%</b>",
         "admin_btn_game21_fees": "♠️ 21 — комиссии",
         "admin_fees_21_title": (
             "♠️ <b>Комиссии игры 21</b>\n\n"
@@ -134,10 +168,39 @@ TEXTS: dict[str, dict[str, str]] = {
             "♠️ <b>Режим 21</b>\n\n"
             "Против бота: {bot}\n\n"
             "Комиссии: бот {bot_fee}% · PvP {users_fee}%\n\n"
-            "Включите PvP для каждого подключённого чата. Если бот уже знает темы форума в чате, после включения откроется экран — где можно играть (как в «Чаты → Темы для игр»)."
+            "Выберите раздел настроек."
+        ),
+        "admin_21_summary": (
+            "♠️ <b>Режим 21</b>\n\n"
+            "-------------------------------------------\n"
+            "Против БОТа:  {bot_fee}%\n\n"
+            "Комиссия: {bot_fee}%\n\n"
+            "Всего игр с БОТОМ: {bot_total}\n"
+            "БОТ выиграл: {bot_won_count} игр, {bot_won_sum} PLN\n"
+            "БОТ проиграл: {bot_lost_count} игр, {bot_lost_sum} PLN\n"
+            "Ничьи: {bot_draw_count}\n\n"
+            "Прибыль БОТа: {bot_profit_sum} PLN\n\n"
+            "-------------------------------------------\n"
+            "Мжду пользователями:\n\n"
+            "Комиссия: {users_fee}%\n\n"
+            "Всего PvP игр: {pvp_total}\n"
+            "Прибыль с комиссии: {pvp_commission_sum} PLN\n\n"
+            "-------------------------------------------\n"
+            "Общая прибыль: {total_profit_sum} PLN"
         ),
         "admin_21_on": "🟢 вкл",
         "admin_21_off": "⚪ выкл",
+        "admin_21_btn_enable": "Включить",
+        "admin_21_btn_rules": "Правила",
+        "admin_21_enable_title": "♠️ <b>21 — включение режимов</b>\n\nВключите игру против бота или PvP для подключённых чатов.",
+        "admin_21_rules_title": "♠️ <b>21 — правила</b>\n\nДля игры с ботом: {bot}\nМежду пользователями: {users}",
+        "admin_21_rules_btn_bot": "Для игры с ботом",
+        "admin_21_rules_btn_users": "Между пользователями",
+        "admin_21_rules_prompt_bot": "Введите правила для игры 21 с ботом:",
+        "admin_21_rules_prompt_users": "Введите правила для игры 21 между пользователями:",
+        "admin_21_rules_empty": "❌ Правила не могут быть пустыми. Введите текст правил.",
+        "admin_21_rules_saved": "✅ Правила сохранены. Переводы для других языков обновлены автоматически.",
+        "admin_21_rules_saved_no_translate": "✅ Правила сохранены на русском. Автоперевод не выполнен: проверьте AI-ключ в настройках.",
         "admin_21_btn_bot_on": "Против бота: выключить",
         "admin_21_btn_bot_off": "Против бота: включить",
         "admin_21_btn_users_on": "PvP глобально: выключить",
@@ -552,7 +615,38 @@ TEXTS: dict[str, dict[str, str]] = {
         "btn_signup": "Sign up for a game",
         "main_menu_chat_fallback": "💬 Chat",
         "btn_play_21_bot": "Play 21",
-        "btn_casino": "🎰 Casino 🎰",
+        "btn_casino": "🎰 Slot 🎰",
+        "slot_enter_bet_with_balance": "Your balance: {balance} PLN\nEnter bet amount (e.g. 1):",
+        "slot_rules_block": "Rules and payouts:\n• 3 of a kind — x4\n• 2 of a kind — x1.1\n• All different — lose",
+        "slot_bet_invalid": "Invalid bet amount. Enter a positive number.",
+        "slot_not_enough_balance": "Insufficient balance for this bet.",
+        "slot_spin_prompt": "Your balance: {balance} PLN\nBet {amount} PLN accepted.\nNow spin 🎰",
+        "slot_balance_update_failed": "Failed to update balance. Please try again.",
+        "slot_combo_three": "3 of a kind",
+        "slot_combo_two": "2 of a kind",
+        "slot_combo_none": "all different",
+        "slot_result_win": "Your balance: {balance} PLN\n🎰 Result: {combo}\nBet {bet} PLN is multiplied by x{mult}\nPayout: {payout} PLN",
+        "slot_result_lose": "Your balance: {balance} PLN\n🎰 Result: {combo}\nBet {bet} PLN is lost.",
+        "slot_disabled": "Slot is currently disabled.",
+        "admin_slot_stats_text": "Slot:\nBOT won: {bot_won_sum} PLN\nBOT lost: {bot_lost_sum} PLN\nTotal BOT profit: {bot_profit_sum} PLN",
+        "admin_slot_mode_text": (
+            "🎰 <b>Slot mode</b>\n\n"
+            "{status}\n\n"
+            "-------------------------------------------\n"
+            "Total games: {total_games}\n"
+            "unique users: {unique_users}\n"
+            "won by users: {users_won_sum} PLN\n"
+            "lost by users: {users_lost_sum} PLN\n"
+            "total bot profit: {bot_profit_sum} PLN\n"
+            "-------------------------------------------"
+        ),
+        "admin_slot_btn_enable": "Enable",
+        "admin_slot_btn_disable": "Disable",
+        "admin_slot_btn_rules": "Rule",
+        "admin_slot_rules_prompt": "Enter Slot rule:",
+        "admin_slot_rules_current": "Current rule:\n{rules}",
+        "admin_slot_rules_empty": "❌ Rule cannot be empty. Enter rule text.",
+        "admin_slot_rules_saved": "✅ Slot rule saved.",
         "btn_admin": "Admin",
         "btn_lang": "🌐",
         "btn_main": "🏠 Main",
@@ -561,7 +655,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_no_access": "⛔ Access denied",
         "admin_btn_games": "🎯 Games",
         "admin_btn_21": "♠️ 21",
-        "admin_btn_casino": "🎰 Casino",
+        "admin_btn_casino": "🎰 Slot",
         "admin_btn_checkers": "🔴 Checkers",
         "admin_btn_kmb": "🪖 KMB",
         "admin_btn_stats": "📊 Statistics",
@@ -575,6 +669,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_payments": "💳 Payments settings",
         "admin_btn_fees": "💸 Fees settings",
         "admin_btn_withdraw_fee": "💸 Withdrawal fee",
+        "admin_btn_slot_fee": "🎰 Slot fee",
         "admin_fees_title": "💸 <b>Fees settings</b>",
         "admin_pay_title": "<b>MBanks</b> — accounts:",
         "admin_pay_empty": "<b>MBanks</b>\nNo accounts yet.",
@@ -583,6 +678,8 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_withdraw_fee_title": "💸 <b>Withdrawal fee</b>\n\nCurrent: <b>{percent}%</b>\n\nEnter a new percent (e.g. <code>5</code> or <code>2.5</code>):",
         "admin_withdraw_fee_invalid": "❌ Invalid format. Enter a number between 0 and 100 (e.g. <code>5</code> or <code>2.5</code>).",
         "admin_withdraw_fee_updated": "✅ Withdrawal fee updated: <b>{percent}%</b>",
+        "admin_slot_fee_title": "🎰 <b>Slot fee</b>\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
+        "admin_slot_fee_updated": "✅ Slot fee updated: <b>{percent}%</b>",
         "admin_btn_game21_fees": "♠️ 21 — fees",
         "admin_fees_21_title": "♠️ <b>Game 21 fees</b>\n\nVs bot: <b>{bot}%</b>\nPvP: <b>{users}%</b>",
         "admin_game21_fee_btn_bot": "Vs bot",
@@ -590,9 +687,20 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_game21_fee_bot_title": "💸 21 fee (vs bot)\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
         "admin_game21_fee_users_title": "💸 21 fee (PvP)\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
         "admin_game21_fee_updated": "✅ 21 fee updated: <b>{percent}%</b>",
-        "admin_21_title": "♠️ <b>Game 21</b>\n\nVs bot: {bot}\n\nFees: bot {bot_fee}% · PvP {users_fee}%\n\nTurn PvP on per connected chat. If the bot already knows forum topics in that chat, enabling PvP opens the topic allowlist screen.",
+        "admin_21_title": "♠️ <b>Game 21</b>\n\nVs bot: {bot}\n\nFees: bot {bot_fee}% · PvP {users_fee}%\n\nChoose settings section.",
         "admin_21_on": "🟢 on",
         "admin_21_off": "⚪ off",
+        "admin_21_btn_enable": "Enable",
+        "admin_21_btn_rules": "Rules",
+        "admin_21_enable_title": "♠️ <b>21 — modes</b>\n\nEnable vs bot or PvP for connected chats.",
+        "admin_21_rules_title": "♠️ <b>21 — rules</b>\n\nVs bot: {bot}\nBetween users: {users}",
+        "admin_21_rules_btn_bot": "Vs bot",
+        "admin_21_rules_btn_users": "Between users",
+        "admin_21_rules_prompt_bot": "Enter rules for 21 vs bot:",
+        "admin_21_rules_prompt_users": "Enter rules for 21 between users:",
+        "admin_21_rules_empty": "❌ Rules cannot be empty. Enter rules text.",
+        "admin_21_rules_saved": "✅ Rules saved. Translations for other languages were updated automatically.",
+        "admin_21_rules_saved_no_translate": "✅ Rules saved in Russian. Auto-translation was not completed: check the AI key in settings.",
         "admin_21_btn_bot_on": "Vs bot: turn off",
         "admin_21_btn_bot_off": "Vs bot: turn on",
         "admin_21_btn_users_on": "PvP global: turn off",
@@ -987,7 +1095,38 @@ TEXTS: dict[str, dict[str, str]] = {
         "btn_signup": "Записатися на гру",
         "main_menu_chat_fallback": "💬 Чат",
         "btn_play_21_bot": "Грати в 21",
-        "btn_casino": "🎰 Казино 🎰",
+        "btn_casino": "🎰 Слот 🎰",
+        "slot_enter_bet_with_balance": "Ваш баланс: {balance} PLN\nВведіть суму ставки (наприклад 1):",
+        "slot_rules_block": "Правила та виплати:\n• 3 однакових — x4\n• 2 однакових — x1.1\n• Усі різні — програш",
+        "slot_bet_invalid": "Невірна сума ставки. Введіть додатне число.",
+        "slot_not_enough_balance": "Недостатньо коштів для ставки.",
+        "slot_spin_prompt": "Ваш баланс: {balance} PLN\nСтавку {amount} PLN прийнято.\nТепер крутіть 🎰",
+        "slot_balance_update_failed": "Не вдалося оновити баланс. Спробуйте ще раз.",
+        "slot_combo_three": "3 однакових",
+        "slot_combo_two": "2 однакових",
+        "slot_combo_none": "усі різні",
+        "slot_result_win": "Ваш баланс: {balance} PLN\nРезультат 🎰: {combo}\nСтавка {bet} PLN множиться на x{mult}\nВиплата: {payout} PLN",
+        "slot_result_lose": "Ваш баланс: {balance} PLN\nРезультат 🎰: {combo}\nСтавка {bet} PLN згоріла.",
+        "slot_disabled": "Слот зараз вимкнено.",
+        "admin_slot_stats_text": "Слот:\nБОТ виграв: {bot_won_sum} PLN\nБОТ програв: {bot_lost_sum} PLN\nЗагальний прибуток БОТа: {bot_profit_sum} PLN",
+        "admin_slot_mode_text": (
+            "🎰 <b>Режим слот</b>\n\n"
+            "{status}\n\n"
+            "-------------------------------------------\n"
+            "Усього ігор: {total_games}\n"
+            "унікальних користувачів: {unique_users}\n"
+            "виграно користувачами: {users_won_sum} PLN\n"
+            "програно користувачами: {users_lost_sum} PLN\n"
+            "загальний прибуток бота: {bot_profit_sum} PLN\n"
+            "-------------------------------------------"
+        ),
+        "admin_slot_btn_enable": "Увімкнути",
+        "admin_slot_btn_disable": "Вимкнути",
+        "admin_slot_btn_rules": "Правило",
+        "admin_slot_rules_prompt": "Введіть правило для Слота:",
+        "admin_slot_rules_current": "Поточне правило:\n{rules}",
+        "admin_slot_rules_empty": "❌ Правило не може бути порожнім. Введіть текст правила.",
+        "admin_slot_rules_saved": "✅ Правило Слота збережено.",
         "btn_admin": "Адмінка",
         "btn_lang": "🌐",
         "btn_main": "🏠 Головна",
@@ -996,7 +1135,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_no_access": "⛔ Немає доступу",
         "admin_btn_games": "🎯 Ігри",
         "admin_btn_21": "♠️ 21",
-        "admin_btn_casino": "🎰 Казино",
+        "admin_btn_casino": "🎰 Слот",
         "admin_btn_checkers": "🔴 Шашки",
         "admin_btn_kmb": "🪖 КМБ",
         "admin_btn_stats": "📊 Статистика",
@@ -1010,6 +1149,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_payments": "💳 Налаштування платежів",
         "admin_btn_fees": "💸 Налаштування комісій",
         "admin_btn_withdraw_fee": "💸 Комісія виводу",
+        "admin_btn_slot_fee": "🎰 Комісія Слота",
         "admin_fees_title": "💸 <b>Налаштування комісій</b>",
         "admin_pay_title": "<b>MBanks</b> — акаунти:",
         "admin_pay_empty": "<b>MBanks</b>\nАкаунтів немає.",
@@ -1018,6 +1158,8 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_withdraw_fee_title": "💸 <b>Комісія виводу</b>\n\nПоточне значення: <b>{percent}%</b>\n\nВведіть новий відсоток (наприклад <code>5</code> або <code>2.5</code>):",
         "admin_withdraw_fee_invalid": "❌ Невірний формат. Введіть число від 0 до 100 (наприклад <code>5</code> або <code>2.5</code>).",
         "admin_withdraw_fee_updated": "✅ Комісію виводу оновлено: <b>{percent}%</b>",
+        "admin_slot_fee_title": "🎰 <b>Комісія Слота</b>\n\nПоточне значення: <b>{percent}%</b>\n\nВведіть новий процент:",
+        "admin_slot_fee_updated": "✅ Комісію Слота оновлено: <b>{percent}%</b>",
         "admin_btn_game21_fees": "♠️ 21 — fees",
         "admin_fees_21_title": "♠️ <b>Game 21 fees</b>\n\nVs bot: <b>{bot}%</b>\nPvP: <b>{users}%</b>",
         "admin_game21_fee_btn_bot": "Vs bot",
@@ -1025,9 +1167,20 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_game21_fee_bot_title": "💸 21 fee (vs bot)\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
         "admin_game21_fee_users_title": "💸 21 fee (PvP)\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
         "admin_game21_fee_updated": "✅ 21 fee updated: <b>{percent}%</b>",
-        "admin_21_title": "♠️ <b>Гра 21</b>\n\nБот: {bot}\n\nКомісії: бот {bot_fee}% · PvP {users_fee}%\n\nУвімкніть PvP для кожного підключеного чату. Якщо бот уже знає теми форуму в цьому чаті, після увімкнення відкриється екран дозволених тем.",
+        "admin_21_title": "♠️ <b>Гра 21</b>\n\nБот: {bot}\n\nКомісії: бот {bot_fee}% · PvP {users_fee}%\n\nВиберіть розділ налаштувань.",
         "admin_21_on": "🟢 on",
         "admin_21_off": "⚪ off",
+        "admin_21_btn_enable": "Увімкнути",
+        "admin_21_btn_rules": "Правила",
+        "admin_21_enable_title": "♠️ <b>21 — режими</b>\n\nУвімкніть гру з ботом або PvP для підключених чатів.",
+        "admin_21_rules_title": "♠️ <b>21 — правила</b>\n\nЗ ботом: {bot}\nМіж користувачами: {users}",
+        "admin_21_rules_btn_bot": "Для гри з ботом",
+        "admin_21_rules_btn_users": "Між користувачами",
+        "admin_21_rules_prompt_bot": "Введіть правила для гри 21 з ботом:",
+        "admin_21_rules_prompt_users": "Введіть правила для гри 21 між користувачами:",
+        "admin_21_rules_empty": "❌ Правила не можуть бути порожніми. Введіть текст правил.",
+        "admin_21_rules_saved": "✅ Правила збережено. Переклади для інших мов оновлено автоматично.",
+        "admin_21_rules_saved_no_translate": "✅ Правила збережено російською. Автопереклад не виконано: перевірте AI-ключ у налаштуваннях.",
         "admin_21_btn_bot_on": "Vs bot: turn off",
         "admin_21_btn_bot_off": "Vs bot: turn on",
         "admin_21_btn_users_on": "PvP global: turn off",
@@ -1422,7 +1575,38 @@ TEXTS: dict[str, dict[str, str]] = {
         "btn_signup": "Zapisz się na grę",
         "main_menu_chat_fallback": "💬 Czat",
         "btn_play_21_bot": "Graj w 21",
-        "btn_casino": "🎰 Kasyno 🎰",
+        "btn_casino": "🎰 Slot 🎰",
+        "slot_enter_bet_with_balance": "Twoje saldo: {balance} PLN\nPodaj kwotę stawki (np. 1):",
+        "slot_rules_block": "Zasady i wypłaty:\n• 3 takie same — x4\n• 2 takie same — x1.1\n• Wszystkie różne — przegrana",
+        "slot_bet_invalid": "Nieprawidłowa kwota stawki. Podaj dodatnią liczbę.",
+        "slot_not_enough_balance": "Niewystarczające środki na tę stawkę.",
+        "slot_spin_prompt": "Twoje saldo: {balance} PLN\nStawka {amount} PLN przyjęta.\nTeraz zakręć 🎰",
+        "slot_balance_update_failed": "Nie udało się zaktualizować salda. Spróbuj ponownie.",
+        "slot_combo_three": "3 takie same",
+        "slot_combo_two": "2 takie same",
+        "slot_combo_none": "wszystkie różne",
+        "slot_result_win": "Twoje saldo: {balance} PLN\nWynik 🎰: {combo}\nStawka {bet} PLN jest mnożona przez x{mult}\nWypłata: {payout} PLN",
+        "slot_result_lose": "Twoje saldo: {balance} PLN\nWynik 🎰: {combo}\nStawka {bet} PLN przepada.",
+        "slot_disabled": "Slot jest obecnie wyłączony.",
+        "admin_slot_stats_text": "Slot:\nBOT wygrał: {bot_won_sum} PLN\nBOT przegrał: {bot_lost_sum} PLN\nŁączny zysk BOTA: {bot_profit_sum} PLN",
+        "admin_slot_mode_text": (
+            "🎰 <b>Tryb slot</b>\n\n"
+            "{status}\n\n"
+            "-------------------------------------------\n"
+            "Łącznie gier: {total_games}\n"
+            "unikalnych użytkowników: {unique_users}\n"
+            "wygrane użytkowników: {users_won_sum} PLN\n"
+            "przegrane użytkowników: {users_lost_sum} PLN\n"
+            "łączny zysk bota: {bot_profit_sum} PLN\n"
+            "-------------------------------------------"
+        ),
+        "admin_slot_btn_enable": "Włącz",
+        "admin_slot_btn_disable": "Wyłącz",
+        "admin_slot_btn_rules": "Zasada",
+        "admin_slot_rules_prompt": "Wpisz zasadę dla Slotu:",
+        "admin_slot_rules_current": "Aktualna zasada:\n{rules}",
+        "admin_slot_rules_empty": "❌ Zasada nie może być pusta. Wpisz tekst zasady.",
+        "admin_slot_rules_saved": "✅ Zasada Slotu zapisana.",
         "btn_admin": "Panel admina",
         "btn_lang": "🌐",
         "btn_main": "🏠 Główna",
@@ -1431,7 +1615,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_no_access": "⛔ Brak dostępu",
         "admin_btn_games": "🎯 Gry",
         "admin_btn_21": "♠️ 21",
-        "admin_btn_casino": "🎰 Kasyno",
+        "admin_btn_casino": "🎰 Slot",
         "admin_btn_checkers": "🔴 Warcaby",
         "admin_btn_kmb": "🪖 KMB",
         "admin_btn_stats": "📊 Statystyka",
@@ -1445,6 +1629,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_payments": "💳 Ustawienia płatności",
         "admin_btn_fees": "💸 Ustawienia prowizji",
         "admin_btn_withdraw_fee": "💸 Prowizja wypłaty",
+        "admin_btn_slot_fee": "🎰 Prowizja Slotu",
         "admin_fees_title": "💸 <b>Ustawienia prowizji</b>",
         "admin_pay_title": "<b>MBanks</b> — konta:",
         "admin_pay_empty": "<b>MBanks</b>\nBrak kont.",
@@ -1453,6 +1638,8 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_withdraw_fee_title": "💸 <b>Prowizja wypłaty</b>\n\nObecnie: <b>{percent}%</b>\n\nWpisz nowy procent (np. <code>5</code> lub <code>2.5</code>):",
         "admin_withdraw_fee_invalid": "❌ Nieprawidłowy format. Wpisz liczbę od 0 do 100 (np. <code>5</code> lub <code>2.5</code>).",
         "admin_withdraw_fee_updated": "✅ Prowizja wypłaty zaktualizowana: <b>{percent}%</b>",
+        "admin_slot_fee_title": "🎰 <b>Prowizja Slotu</b>\n\nObecnie: <b>{percent}%</b>\n\nPodaj nowy procent:",
+        "admin_slot_fee_updated": "✅ Prowizja Slotu zaktualizowana: <b>{percent}%</b>",
         "admin_btn_game21_fees": "♠️ 21 — fees",
         "admin_fees_21_title": "♠️ <b>Game 21 fees</b>\n\nVs bot: <b>{bot}%</b>\nPvP: <b>{users}%</b>",
         "admin_game21_fee_btn_bot": "Vs bot",
@@ -1460,9 +1647,20 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_game21_fee_bot_title": "💸 21 fee (vs bot)\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
         "admin_game21_fee_users_title": "💸 21 fee (PvP)\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
         "admin_game21_fee_updated": "✅ 21 fee updated: <b>{percent}%</b>",
-        "admin_21_title": "♠️ <b>Gra 21</b>\n\nVs bot: {bot}\n\nProwizje: bot {bot_fee}% · PvP {users_fee}%\n\nWłącz PvP osobno dla każdego podłączonego czatu. Gdy bot zna wątki forum w tym czacie, po włączeniu otworzy się ekran dozwolonych wątków.",
+        "admin_21_title": "♠️ <b>Gra 21</b>\n\nVs bot: {bot}\n\nProwizje: bot {bot_fee}% · PvP {users_fee}%\n\nWybierz sekcję ustawień.",
         "admin_21_on": "🟢 on",
         "admin_21_off": "⚪ off",
+        "admin_21_btn_enable": "Włącz",
+        "admin_21_btn_rules": "Zasady",
+        "admin_21_enable_title": "♠️ <b>21 — tryby</b>\n\nWłącz grę z botem lub PvP dla podłączonych czatów.",
+        "admin_21_rules_title": "♠️ <b>21 — zasady</b>\n\nZ botem: {bot}\nMiędzy użytkownikami: {users}",
+        "admin_21_rules_btn_bot": "Dla gry z botem",
+        "admin_21_rules_btn_users": "Między użytkownikami",
+        "admin_21_rules_prompt_bot": "Wpisz zasady gry 21 z botem:",
+        "admin_21_rules_prompt_users": "Wpisz zasady gry 21 między użytkownikami:",
+        "admin_21_rules_empty": "❌ Zasady nie mogą być puste. Wpisz tekst zasad.",
+        "admin_21_rules_saved": "✅ Zasady zapisane. Tłumaczenia dla innych języków zostały zaktualizowane automatycznie.",
+        "admin_21_rules_saved_no_translate": "✅ Zasady zapisane po rosyjsku. Automatyczne tłumaczenie nie zostało wykonane: sprawdź klucz AI w ustawieniach.",
         "admin_21_btn_bot_on": "Vs bot: turn off",
         "admin_21_btn_bot_off": "Vs bot: turn on",
         "admin_21_btn_users_on": "PvP global: turn off",

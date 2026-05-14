@@ -12,3 +12,7 @@ class MBankAccountState(StatesGroup):
 
 class WithdrawFeeState(StatesGroup):
     waiting_percent = State()
+
+
+class SlotFeeState(StatesGroup):
+    waiting_percent = State()

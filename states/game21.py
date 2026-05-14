@@ -13,3 +13,7 @@ class Play21PvpState(StatesGroup):
 
 class Game21FeeState(StatesGroup):
     waiting_percent = State()
+
+
+class Game21RulesState(StatesGroup):
+    waiting_text = State()

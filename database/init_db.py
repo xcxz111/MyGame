@@ -33,6 +33,8 @@ from database.models import (  # noqa: F401  — регистрирует мод
     MBankTransaction,
     PaymentLog,
     Prize,
+    SlotSettings,
+    SlotSpin,
     Throw,
     User,
     Withdrawal,
@@ -77,7 +79,13 @@ def _migrate_game21_to_game_bot_schema(connection) -> None:
     cols = {c["name"] for c in insp.get_columns("game21_settings")}
     for col, ddl in (
         ("rules_bot_text", "MEDIUMTEXT NULL"),
+        ("rules_bot_text_en", "MEDIUMTEXT NULL"),
+        ("rules_bot_text_uk", "MEDIUMTEXT NULL"),
+        ("rules_bot_text_pl", "MEDIUMTEXT NULL"),
         ("rules_users_text", "MEDIUMTEXT NULL"),
+        ("rules_users_text_en", "MEDIUMTEXT NULL"),
+        ("rules_users_text_uk", "MEDIUMTEXT NULL"),
+        ("rules_users_text_pl", "MEDIUMTEXT NULL"),
     ):
         if col not in cols:
             connection.execute(text(f"ALTER TABLE `game21_settings` ADD COLUMN `{col}` {ddl}"))
@@ -98,6 +106,20 @@ def _ensure_app_chats_button_titles(connection) -> None:
         if col not in cols:
             connection.execute(text(f"ALTER TABLE `app_chats` ADD COLUMN `{col}` {ddl}"))
             cols.add(col)
+
+
+def _ensure_fees_slot_percent(connection) -> None:
+    insp = inspect(connection)
+    if "fees" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("fees")}
+    if "slot_percent" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `fees` ADD COLUMN `slot_percent` DECIMAL(5,2) NOT NULL "
+                "DEFAULT 0.00 COMMENT 'Комиссия игры Слот, в процентах от выплаты'"
+            )
+        )
 
 
 def _ensure_games_message_thread_id(connection) -> None:
@@ -148,6 +170,7 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(_migrate_game21_to_game_bot_schema)
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_ensure_fees_slot_percent)
         await conn.run_sync(_ensure_app_chats_button_titles)
         await conn.run_sync(_ensure_app_chats_game21_users)
         await conn.run_sync(_ensure_games_message_thread_id)

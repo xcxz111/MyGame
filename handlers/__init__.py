@@ -11,6 +11,7 @@ from handlers.forum_topic_sync import router as forum_topic_sync_router
 from handlers.game_play import router as game_play_router
 from handlers.game_signup import router as game_signup_router
 from handlers.menu import router as menu_router
+from handlers.slot import router as slot_router
 from handlers.start import router as start_router
 from handlers.topup import router as topup_router
 from handlers.withdraw import router as withdraw_router
@@ -21,6 +22,7 @@ def setup_routers() -> Router:
     root.include_router(start_router)
     root.include_router(menu_router)
     root.include_router(game21_router)
+    root.include_router(slot_router)
     root.include_router(game_signup_router)
     root.include_router(cabinet_router)
     root.include_router(topup_router)

@@ -46,20 +46,24 @@ def main_menu_keyboard(
     admin_telegram_id: int | None,
     *,
     menu_chats: Sequence[AppChat] | None = None,
+    show_game21: bool = True,
+    show_slot: bool = True,
 ) -> InlineKeyboardMarkup:
     lang = language_code
     builder = InlineKeyboardBuilder()
     casino_text = t("btn_casino", lang)
     if casino_text == "btn_casino":
-        casino_text = "🎰 Казино 🎰"
+        casino_text = "🎰 Слот 🎰"
 
     builder.add(InlineKeyboardButton(text=t("btn_cabinet", lang), callback_data="menu:cabinet"))
     builder.add(InlineKeyboardButton(text=t("btn_topup", lang), callback_data="menu:topup"))
     builder.add(InlineKeyboardButton(text=t("btn_signup", lang), callback_data="menu:signup"))
     for chat_btn in main_menu_chat_link_buttons(menu_chats, lang):
         builder.add(chat_btn)
-    builder.add(InlineKeyboardButton(text=t("btn_play_21_bot", lang), callback_data="menu:play21bot"))
-    builder.add(InlineKeyboardButton(text=casino_text, callback_data="menu:casino"))
+    if show_game21:
+        builder.add(InlineKeyboardButton(text=t("btn_play_21_bot", lang), callback_data="menu:play21bot"))
+    if show_slot:
+        builder.add(InlineKeyboardButton(text=casino_text, callback_data="menu:casino"))
 
     if admin_telegram_id is not None and int(user_id) == int(admin_telegram_id):
         builder.add(InlineKeyboardButton(text=t("btn_admin", lang), callback_data="menu:admin"))

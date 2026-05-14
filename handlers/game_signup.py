@@ -17,10 +17,12 @@ from database.models import User
 from database.models.game import Game, GameStatus
 from database.models.payment_log import PaymentLogMethod
 from database.repositories import app_chats as app_chats_repo
+from database.repositories import game21_settings as g21_repo
 from database.repositories import game_participants as gp_repo
 from database.repositories import games as games_repo
 from database.repositories import payment_logs as payment_logs_repo
 from database.repositories import prizes as prizes_repo
+from database.repositories import slot as slot_repo
 from keyboards.main_menu import main_menu_keyboard
 from locales.texts import get_lang, t
 from settings import get_settings
@@ -145,6 +147,8 @@ async def on_menu_signup(
     games = await games_repo.list_draft_future_for_signup(session, now)
     if not games:
         menu_chats = await app_chats_repo.list_for_main_menu(session)
+        show_game21 = await g21_repo.any_game21_enabled(session)
+        show_slot = await slot_repo.is_enabled(session)
         await callback.message.edit_text(
             t("game_signup_no_games", lang),
             reply_markup=main_menu_keyboard(
@@ -152,6 +156,8 @@ async def on_menu_signup(
                 user.user_id,
                 get_settings().admin_id,
                 menu_chats=menu_chats,
+                show_game21=show_game21,
+                show_slot=show_slot,
             ),
         )
         await callback.answer()

@@ -23,7 +23,13 @@ class Game21Settings(Base):
         Numeric(5, 2), default=Decimal("0.00"), server_default="0.00"
     )
     rules_bot_text: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
+    rules_bot_text_en: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
+    rules_bot_text_uk: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
+    rules_bot_text_pl: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
     rules_users_text: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
+    rules_users_text_en: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
+    rules_users_text_uk: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
+    rules_users_text_pl: Mapped[str | None] = mapped_column(MEDIUMTEXT, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
     )

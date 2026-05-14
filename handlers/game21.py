@@ -22,6 +22,7 @@ from database.repositories import app_chats as app_chats_repo
 from database.repositories import app_chat_allowed_topics as allowed_topics_repo
 from database.repositories import forum_topics as forum_topics_repo
 from database.repositories import game21_settings as g21_repo
+from database.repositories import slot as slot_repo
 from keyboards.game21 import (
     play21_busy_keyboard,
     play21_confirm_keyboard,
@@ -441,7 +442,7 @@ async def on_play21_rules(
     s = await g21_repo.get_settings(session)
     parts = []
     if s.enabled_bot:
-        parts.append(t("game21_rules_bot", lang))
+        parts.append((g21_repo.rules_bot_for_lang(s, lang) or "").strip() or t("game21_rules_bot", lang))
     pvp_chats = await _collect_pvp_chats(bot, session, user.user_id)
     pvp_on = bool(pvp_chats)
     if pvp_on and pvp_chats:
@@ -451,7 +452,12 @@ async def on_play21_rules(
             ctitle = html.escape((chat.title or str(cid))[:80])
         except Exception:
             ctitle = "—"
-        parts.append(t("game21_rules_users", lang).format(chat_title=ctitle))
+        users_rules = (g21_repo.rules_users_for_lang(s, lang) or "").strip() or t("game21_rules_users", lang)
+        try:
+            users_rules = users_rules.format(chat_title=ctitle)
+        except (KeyError, IndexError, ValueError):
+            pass
+        parts.append(users_rules)
     text = t("game21_rules_title", lang) + "\n\n" + ("\n\n".join(parts) if parts else t("game21_rules", lang))
     await _edit_text_skip_not_modified(callback.message, text, reply_markup=play21_rules_back_keyboard(lang))
     await callback.answer()
@@ -535,9 +541,11 @@ async def on_play21_bot_confirm_yes(
         await state.clear()
         return
     await state.clear()
+    s = await g21_repo.get_settings(session)
+    rules_bot_text = (g21_repo.rules_bot_for_lang(s, lang) or "").strip()
     await _edit_text_skip_not_modified(
         callback.message,
-        t("game21_rules_title", lang) + "\n\n" + t("game21_rules_bot", lang),
+        t("game21_rules_title", lang) + "\n\n" + (rules_bot_text or t("game21_rules_bot", lang)),
         reply_markup=None,
     )
     await callback.answer()
@@ -550,11 +558,18 @@ async def on_play21_bot_confirm_no(
     lang = _lang(user, callback)
     await state.clear()
     menu_chats = await app_chats_repo.list_for_main_menu(session)
+    show_game21 = await g21_repo.any_game21_enabled(session)
+    show_slot = await slot_repo.is_enabled(session)
     await _edit_text_skip_not_modified(
         callback.message,
         t("game21_cancelled", lang),
         reply_markup=main_menu_keyboard(
-            lang, user.user_id, get_settings().admin_id, menu_chats=menu_chats
+            lang,
+            user.user_id,
+            get_settings().admin_id,
+            menu_chats=menu_chats,
+            show_game21=show_game21,
+            show_slot=show_slot,
         ),
     )
     await callback.answer()
@@ -1023,7 +1038,7 @@ async def on_pvp_stop_cb(
     await apply_pvp_stop(bot, sm, callback, lang)
 
 
-@router.message(F.chat.type == "private", F.dice, ~F.from_user.is_bot)
+@router.message(F.chat.type == "private", F.dice.emoji == "🎲", ~F.from_user.is_bot)
 async def on_private_dice_21(
     message: Message, session: AsyncSession, user: User, bot: Bot
 ) -> None:
