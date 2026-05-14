@@ -336,6 +336,20 @@ def _ensure_app_chats_checkers_enabled(connection) -> None:
         )
 
 
+def _ensure_app_chats_kmb_enabled(connection) -> None:
+    insp = inspect(connection)
+    if "app_chats" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("app_chats")}
+    if "kmb_enabled" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `app_chats` ADD COLUMN `kmb_enabled` SMALLINT NOT NULL "
+                "DEFAULT 0 COMMENT 'PvP КМБ в чате'"
+            )
+        )
+
+
 async def init_db() -> None:
     """Создаёт таблицы по моделям. Движок не закрывает — он переиспользуется ботом."""
     engine = get_engine()
@@ -350,6 +364,7 @@ async def init_db() -> None:
         await conn.run_sync(_ensure_app_chats_button_titles)
         await conn.run_sync(_ensure_app_chats_game21_users)
         await conn.run_sync(_ensure_app_chats_checkers_enabled)
+        await conn.run_sync(_ensure_app_chats_kmb_enabled)
         await conn.run_sync(_ensure_games_message_thread_id)
         await conn.run_sync(_ensure_games_announcement_general)
 

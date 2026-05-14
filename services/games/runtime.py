@@ -191,6 +191,7 @@ async def send_5min_reminders(bot: Bot, session_maker: SessionMaker) -> None:
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
         show_checkers = await checkers_repo.is_enabled(session)
+        show_kmb = await app_chats_repo.any_kmb_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         for game in games:
             try:
@@ -224,6 +225,7 @@ async def send_5min_reminders(bot: Bot, session_maker: SessionMaker) -> None:
                             menu_chats=menu_chats,
                             show_game21=show_game21,
                             show_checkers=show_checkers,
+                            show_kmb=show_kmb,
                             show_slot=show_slot,
                         ),
                     )
@@ -270,6 +272,7 @@ async def _cancel_game_not_enough(
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
         show_checkers = await checkers_repo.is_enabled(session)
+        show_kmb = await app_chats_repo.any_kmb_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         await session.commit()
 
@@ -315,6 +318,7 @@ async def _cancel_game_not_enough(
                     menu_chats=menu_chats,
                     show_game21=show_game21,
                     show_checkers=show_checkers,
+                    show_kmb=show_kmb,
                     show_slot=show_slot,
                 ),
             )
@@ -1251,9 +1255,20 @@ async def _do_tiebreak_and_winners(
 
     settings = get_settings()
     async with session_maker() as session:
+        locked_game = await games_repo.get_active_for_update(session, game_id)
+        if locked_game is None:
+            await session.rollback()
+            logger.warning(
+                "tournament settle skipped: game %s not in active state (duplicate finish?)",
+                game_id,
+            )
+            _release_round_state(game_id)
+            return False
+
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
         show_checkers = await checkers_repo.is_enabled(session)
+        show_kmb = await app_chats_repo.any_kmb_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         prize_rows = await prizes_repo.for_game(session, game_id)
         by_place = {p.place_number: p.amount for p in prize_rows}
@@ -1289,12 +1304,13 @@ async def _do_tiebreak_and_winners(
                         menu_chats=menu_chats,
                         show_game21=show_game21,
                         show_checkers=show_checkers,
+                        show_kmb=show_kmb,
                         show_slot=show_slot,
                     ),
                 )
             except Exception as exc:
                 logger.warning("prize dm user=%s: %s", uid, exc)
-        g = await games_repo.get(session, game_id)
+        g = locked_game
         ann_id = g.announcement_message_id if g else None
         ann_gen_id = g.announcement_message_id_general if g else None
         list_mid = state.get("list_message_id")

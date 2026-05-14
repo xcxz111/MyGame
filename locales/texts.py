@@ -171,6 +171,10 @@ TEXTS: dict[str, dict[str, str]] = {
             "Всего игр в КНБ: {total_games}\n"
             "Прибыль с комиссии: {commission_sum} PLN"
         ),
+        "admin_kmb_btn_enable": "Включить/Выключить",
+        "admin_kmb_enable_title": "👊✌️🤚 КМБ 👊✌️🤚\n\nВыберите чат для включения/выключения игры:",
+        "admin_kmb_chat_on": "КМБ в «{title}»: выкл",
+        "admin_kmb_chat_off": "КМБ в «{title}»: вкл",
         "admin_kmb_btn_rules": "Правила",
         "admin_kmb_rules_title": "Правила КНБ\n\n{rules}",
         "admin_kmb_rules_prompt": "Введите правила КНБ:",
@@ -527,6 +531,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "checkers_draw_result": "Игра окончена.\nНичья.\n\nСтавка {amount} PLN возвращена обоим игрокам.",
         "checkers_winner": "Игра окончена.\nПобедитель: {name}\n\nВыигрыш {payout} PLN добавлен на баланс.",
         "kmb_choose_chat": "Выберите чат для игры в КМБ:",
+        "kmb_no_chats": "КМБ сейчас недоступен: нет включённых чатов или тем.",
         "kmb_choose_topic": "Выберите игровую комнату (🟢 свободна, 🔴 занята):",
         "kmb_enter_wins": "<b>{chat}</b>\nДо скольких побед играем?\nВведите число от 1 до 10:",
         "kmb_wins_invalid": "Неверное количество побед. Введите число от 1 до 10.",
@@ -875,6 +880,238 @@ TEXTS: dict[str, dict[str, str]] = {
         "cabinet_level": "⭐ Level: <b>{level}</b>",
         "cabinet_next_level": "📈 Until level {level}: <b>{amount} PLN</b>",
         "cabinet_next_level_max": "📈 Next level: <b>maximum level reached</b>",
+        "cabinet_referral_link": "🔗 Your referral link:\n<code>{link}</code>",
+        "btn_referral_program": "🤝 Referral program",
+        "btn_return_main": "back to main menu",
+        "btn_checkers": "⚪️ Checkers ⚫️",
+        "btn_kmb": "👊✌️🤚 RPS 👊✌️🤚",
+        "input_cancel_hint": "type /back to cancel",
+        "referral_empty": "No referrals yet.",
+        "referral_line": "• {name} — {profit} PLN",
+        "referral_program_text": (
+            "🤝 <b>Referral program</b>\n\n"
+            "Your link:\n<code>{link}</code>\n\n"
+            "Terms: invite players with your link and earn <b>{percent}%</b> "
+            "of each winning bet your referral makes\n\n"
+            "<b>Your referrals:</b>\n{referrals}"
+        ),
+        "admin_21_summary": (
+            "♠️ <b>21 mode</b>\n\n"
+            "-------------------------------------------\n"
+            "Vs BOT:\n\n"
+            "Fee: {bot_fee}%\n\n"
+            "Total BOT games: {bot_total}\n"
+            "BOT won: {bot_won_count} games, {bot_won_sum} PLN\n"
+            "BOT lost: {bot_lost_count} games, {bot_lost_sum} PLN\n"
+            "Draws: {bot_draw_count}\n\n"
+            "BOT profit: {bot_profit_sum} PLN\n\n"
+            "-------------------------------------------\n"
+            "PvP:\n\n"
+            "Fee: {users_fee}%\n\n"
+            "Total PvP games: {pvp_total}\n"
+            "Commission profit: {pvp_commission_sum} PLN\n\n"
+            "-------------------------------------------\n"
+            "Total profit: {total_profit_sum} PLN"
+        ),
+        "admin_btn_checkers_fee": "⚪️ Checkers fee ⚫️",
+        "admin_btn_kmb_fee": "👊✌️🤚 RPS fee",
+        "admin_btn_levels": "⭐ Level settings",
+        "admin_btn_referral_fee": "🤝 Referral fee",
+        "admin_checkers_btn_disable": "Disable",
+        "admin_checkers_btn_enable": "Enable / Disable",
+        "admin_checkers_btn_rules": "Rules",
+        "admin_checkers_chat_off": "Checkers in «{title}»: ON",
+        "admin_checkers_chat_on": "Checkers in «{title}»: OFF",
+        "admin_checkers_enable_title": "⚪️ Checkers ⚫️\n\nPick a chat to enable or disable the game:",
+        "admin_checkers_fee_title": "⚪️ <b>Checkers fee</b> ⚫️\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
+        "admin_checkers_fee_updated": "✅ Checkers fee updated: <b>{percent}%</b>",
+        "admin_checkers_rules_empty": "Rules are not set yet.",
+        "admin_checkers_rules_prompt": "Enter checkers rules in Russian. The bot will save them and translate for other languages.",
+        "admin_checkers_rules_title": "⚪️ Checkers rules ⚫️\n\n{rules}",
+        "admin_checkers_title": "⚪️ Checkers ⚫️\n\nFee: {commission}%\n\nTotal games: {total_games}\nCommission profit: {commission_sum} PLN",
+        "admin_kmb_btn_enable": "Enable / Disable",
+        "admin_kmb_btn_rules": "Rules",
+        "admin_kmb_chat_off": "RPS in «{title}»: ON",
+        "admin_kmb_chat_on": "RPS in «{title}»: OFF",
+        "admin_kmb_enable_title": "👊✌️🤚 RPS 👊✌️🤚\n\nPick a chat to enable or disable the game:",
+        "admin_kmb_fee_title": "👊✌️🤚 <b>RPS fee</b>\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
+        "admin_kmb_fee_updated": "✅ RPS fee updated: <b>{percent}%</b>",
+        "admin_kmb_rules_empty": "Rules are not set yet.",
+        "admin_kmb_rules_prompt": "Enter RPS rules:",
+        "admin_kmb_rules_saved": "✅ RPS rules saved.",
+        "admin_kmb_rules_title": "RPS rules\n\n{rules}",
+        "admin_kmb_title": "RPS\n\nFee: {commission}%\n\nUnique users: {unique_users}\nTotal RPS games: {total_games}\nCommission profit: {commission_sum} PLN",
+        "admin_levels_btn_disable": "Disable",
+        "admin_levels_btn_enable": "Enable",
+        "admin_levels_btn_referral": "Referral bonus",
+        "admin_levels_btn_required": "Requirement",
+        "admin_levels_btn_reward": "Balance reward",
+        "admin_levels_btn_title": "Title",
+        "admin_levels_btn_withdraw": "Withdraw discount",
+        "admin_levels_detail": (
+            "⭐ <b>Level {level}</b>\n\n"
+            "Title: <b>{title}</b>\n"
+            "Status: {status}\n\n"
+            "Winning bets required: <b>{required} PLN</b>\n"
+            "Balance reward: <b>{reward} PLN</b>\n"
+            "Withdraw fee discount: <b>{withdraw}%</b>\n"
+            "Referral % bonus: <b>{referral}%</b>"
+        ),
+        "admin_levels_invalid_amount": "❌ Enter a positive number or 0.",
+        "admin_levels_invalid_percent": "❌ Enter a percent from 0 to 100.",
+        "admin_levels_invalid_text": "❌ Text cannot be empty.",
+        "admin_levels_not_found": "❌ Level not found.",
+        "admin_levels_prompt_referral": "Enter referral % bonus for level {level} (0-100):",
+        "admin_levels_prompt_required": "Enter winning bet sum required for level {level}:",
+        "admin_levels_prompt_reward": "Enter balance reward for level {level}:",
+        "admin_levels_prompt_title": "Enter title for level {level}:",
+        "admin_levels_prompt_withdraw": "Enter withdraw fee discount for level {level} (0-100):",
+        "admin_levels_saved": "✅ Saved.",
+        "admin_levels_status_off": "⚪ disabled",
+        "admin_levels_status_on": "🟢 enabled",
+        "admin_levels_title": "⭐ <b>Level settings</b>\n\nPick a level to edit:",
+        "admin_referral_fee_title": "🤝 <b>Referral fee</b>\n\nCurrent: <b>{percent}%</b>\n\nEnter new percent:",
+        "admin_referral_fee_updated": "✅ Referral fee updated: <b>{percent}%</b>",
+        "admin_user_amount_invalid": "❌ Enter a positive amount.",
+        "admin_user_banned": "User banned.",
+        "admin_user_btn_ban": "🚫 Ban",
+        "admin_user_btn_find_other": "🔎 Find another user",
+        "admin_user_btn_referral_percent": "🤝 Change referral %",
+        "admin_user_btn_topup": "💳 Top up balance",
+        "admin_user_btn_unban": "✅ Unban",
+        "admin_user_btn_withdraw_percent": "💸 Change withdrawal fee",
+        "admin_user_card": (
+            "👤 <b>{label}</b>\n\n"
+            "ID: <code>{user_id}</code>\n"
+            "Username: {username}\n"
+            "Status: {status}\n"
+            "Balance: <b>{balance} PLN</b>\n"
+            "Level: <b>{level}</b>\n"
+            "Winning bets toward level: {level_progress} PLN\n"
+            "Level bonus: withdraw −{level_withdraw_discount}%, referral +{level_referral_bonus}%\n"
+            "Language: {language}\n"
+            "Invited by: {referrer}\n\n"
+            "Withdrawal fee: <b>{withdraw_percent}%</b> ({withdraw_source})\n"
+            "Referral %: <b>{referral_percent}%</b> ({referral_source})\n\n"
+            "Referrals: {referrals_count}\n"
+            "Profit from referrals: {referrals_profit} PLN"
+        ),
+        "admin_user_not_found": "❌ User not found. Enter ID or username again.",
+        "admin_user_percent_global": "global {percent}%",
+        "admin_user_percent_invalid": "❌ Enter percent 0–100 or <code>-</code> to reset.",
+        "admin_user_percent_personal": "personal {percent}%",
+        "admin_user_percent_reset": "no personal override",
+        "admin_user_referral_bonus": "global {global_percent}% + bonus {bonus}%",
+        "admin_user_referral_done": "✅ Referral bonus updated: <b>{percent}</b>.",
+        "admin_user_referral_prompt": (
+            "Enter referral bonus for {user} / <code>{user_id}</code>.\n\n"
+            "Example: if global referral is 1% and you send <code>1</code>, effective is 2%.\n\n"
+            "Send percent 0–100 or <code>-</code> to remove personal bonus."
+        ),
+        "admin_user_search_prompt": "👥 Enter user ID or username:",
+        "admin_user_status_active": "🟢 active",
+        "admin_user_status_banned": "🔴 banned",
+        "admin_user_topup_done": "✅ Balance topped up by <b>{amount} PLN</b>.",
+        "admin_user_topup_prompt": "Enter top-up amount for {user} / <code>{user_id}</code>:",
+        "admin_user_unbanned": "User unbanned.",
+        "admin_user_withdraw_discount": "global {global_percent}% − discount {discount}%",
+        "admin_user_withdraw_done": "✅ Withdrawal discount updated: <b>{percent}</b>.",
+        "admin_user_withdraw_prompt": (
+            "Enter withdrawal fee discount for {user} / <code>{user_id}</code>.\n\n"
+            "Example: if global fee is 10% and you send <code>1</code>, effective is 9%.\n\n"
+            "Send percent 0–100 or <code>-</code> to remove personal discount."
+        ),
+        "checkers_active_notice": "You already have an active game or search.",
+        "checkers_bad_move": "This move is not allowed.",
+        "checkers_board_text": "⚪️ <b>Checkers</b> ⚫️\n⚪ {white}\n⚫ {black}\n\nPot: {amount} PLN\nTurn: {turn}",
+        "checkers_btn_accept": "Accept game",
+        "checkers_choose_chat": "Pick a chat for checkers:",
+        "checkers_choose_topic": "Pick a game room (🟢 free, 🔴 busy):",
+        "checkers_confirm": "Bet: {amount} PLN\nWin amount: {win} PLN\nStart opponent search?",
+        "checkers_decide_white": "{players} — roll 🎲 once each. Higher roll plays white.",
+        "checkers_disabled": "Checkers is temporarily disabled.",
+        "checkers_draw_countdown": (
+            "No capture for {no_capture} moves.\n"
+            "If no capture in the next 10 moves (5 per side), it will be a draw.\n\n"
+            "Moves until draw: {remaining}"
+        ),
+        "checkers_draw_countdown_reset": "A piece was captured. Draw countdown reset.",
+        "checkers_draw_result": "Game over.\nDraw.\n\nBet {amount} PLN refunded to both players.",
+        "checkers_enter_bet": "<b>{chat}</b>\nYour balance: {balance} PLN\nEnter bet amount:",
+        "checkers_flood_wait": "Too fast. Wait {seconds} s.",
+        "checkers_match_prize": "Win amount: {win} PLN",
+        "checkers_match_rules_heading": "Rules:",
+        "checkers_match_started_in_topic": "Checkers started in {room}",
+        "checkers_match_title": "Checkers",
+        "checkers_not_your_turn": "Not your turn.",
+        "checkers_rules_body": (
+            "White moves first. Pieces move diagonally; captures are mandatory. "
+            "Kings move any distance diagonally. If you do not move within 2 minutes, you lose."
+        ),
+        "checkers_search_cancelled_refund": "Cancelled.\nBet returned to balance.",
+        "checkers_search_post": "{user} is looking for a checkers opponent.\nBet: {amount} PLN\nWin amount: {win} PLN",
+        "checkers_search_started": "Checkers search started. Bet {amount} PLN deducted.",
+        "checkers_search_timeout": "No one accepted. Bet {amount} PLN returned to balance.",
+        "checkers_turn_timeout_result": "Time is up.\n{loser} lost.\n\nWinner: {winner}\n{payout} PLN credited to balance.",
+        "checkers_turn_timeout_warning": "{name}, you have 1 minute to move or you lose.",
+        "checkers_white_chosen": "{name} plays white. Game begins.",
+        "checkers_winner": "Game over.\nWinner: {name}\n\n{payout} PLN credited to balance.",
+        "kmb_btn_accept": "Accept game",
+        "kmb_choice_saved": "Choice saved.",
+        "kmb_choose_chat": "Pick a chat for RPS:",
+        "kmb_choose_topic": "Pick a game room (🟢 free, 🔴 busy):",
+        "kmb_confirm": "First to {wins} wins\nBet: {amount} PLN\nWin amount: {win} PLN\nStart search?",
+        "kmb_enter_bet": "<b>{chat}</b>\nYour balance: {balance} PLN\nEnter bet amount:",
+        "kmb_enter_wins": "<b>{chat}</b>\nPlay first to how many wins?\nEnter 1–10:",
+        "kmb_match_prize": "Win amount: {win} PLN",
+        "kmb_match_rules_heading": "Rules:",
+        "kmb_match_started_in_topic": "Rock/Paper/Scissors started in {room}",
+        "kmb_match_title": "Rock / Paper / Scissors",
+        "kmb_no_chats": "RPS unavailable: no enabled chats or topics.",
+        "kmb_not_your_game": "This is not your game.",
+        "kmb_pick_done": "choice made",
+        "kmb_pick_prompt": (
+            "👊✌️🤚 <b>RPS</b>\n\n"
+            "First to {wins} wins\n"
+            "Score: {p1_score} - {p2_score}\n\n"
+            "{p1}: {p1_status}\n"
+            "{p2}: {p2_status}\n\n"
+            "Pick rock, scissors or paper."
+        ),
+        "kmb_pick_wait": "waiting for choice",
+        "kmb_result_draw": (
+            "Draw.\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Score: {p1_score} - {p2_score}\n"
+            "First to {wins} wins.\n\n"
+            "Pick again."
+        ),
+        "kmb_result_win": (
+            "Game over.\n"
+            "Final score: {p1_score} - {p2_score}\n\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Winner: {winner}\n"
+            "{payout} PLN credited to balance."
+        ),
+        "kmb_round_win": (
+            "Round over.\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Round winner: {winner}\n"
+            "Score: {p1_score} - {p2_score}\n\n"
+            "First to {wins} wins. Pick again."
+        ),
+        "kmb_rules_body": (
+            "Rock beats scissors, scissors cut paper, paper covers rock. "
+            "Same choice is a tie and the round is replayed."
+        ),
+        "kmb_search_cancelled_refund": "Cancelled.\nBet returned to balance.",
+        "kmb_search_post": "{user} is looking for an RPS opponent.\nFirst to {wins} wins\nBet: {amount} PLN\nWin amount: {win} PLN",
+        "kmb_search_started": "RPS search started. First to {wins} wins. Bet {amount} PLN deducted.",
+        "kmb_search_timeout": "No one accepted. Bet {amount} PLN returned to balance.",
+        "kmb_wins_invalid": "Invalid wins count. Enter 1–10.",
         "btn_signup": "Sign up for a game",
         "main_menu_chat_fallback": "💬 Chat",
         "btn_play_21_bot": "Play 21",
@@ -1382,6 +1619,238 @@ TEXTS: dict[str, dict[str, str]] = {
         "cabinet_level": "⭐ Рівень: <b>{level}</b>",
         "cabinet_next_level": "📈 До рівня {level}: <b>{amount} PLN</b>",
         "cabinet_next_level_max": "📈 Наступний рівень: <b>максимальний рівень досягнуто</b>",
+        "cabinet_referral_link": "🔗 Ваше реферальне посилання:\n<code>{link}</code>",
+        "btn_referral_program": "🤝 Реферальна програма",
+        "btn_return_main": "повернутися на головну",
+        "btn_checkers": "⚪️ Шашки ⚫️",
+        "btn_kmb": "👊✌️🤚 КНБ 👊✌️🤚",
+        "input_cancel_hint": "натисніть /back для скасування",
+        "referral_empty": "Поки немає рефералів.",
+        "referral_line": "• {name} — {profit} PLN",
+        "referral_program_text": (
+            "🤝 <b>Реферальна програма</b>\n\n"
+            "Ваше посилання:\n<code>{link}</code>\n\n"
+            "Умови: запрошуйте гравців за посиланням і отримуйте <b>{percent}%</b> "
+            "з кожної виграної ставки вашого реферала\n\n"
+            "<b>Ваші реферали:</b>\n{referrals}"
+        ),
+        "admin_21_summary": (
+            "♠️ <b>Режим 21</b>\n\n"
+            "-------------------------------------------\n"
+            "Проти БОТА:\n\n"
+            "Комісія: {bot_fee}%\n\n"
+            "Усього ігор з БОТОМ: {bot_total}\n"
+            "БОТ виграв: {bot_won_count} ігор, {bot_won_sum} PLN\n"
+            "БОТ програв: {bot_lost_count} ігор, {bot_lost_sum} PLN\n"
+            "Нічиї: {bot_draw_count}\n\n"
+            "Прибуток БОТА: {bot_profit_sum} PLN\n\n"
+            "-------------------------------------------\n"
+            "Між користувачами:\n\n"
+            "Комісія: {users_fee}%\n\n"
+            "Усього PvP ігор: {pvp_total}\n"
+            "Прибуток з комісії: {pvp_commission_sum} PLN\n\n"
+            "-------------------------------------------\n"
+            "Загальний прибуток: {total_profit_sum} PLN"
+        ),
+        "admin_btn_checkers_fee": "⚪️ Комісія шашок ⚫️",
+        "admin_btn_kmb_fee": "👊✌️🤚 Комісія КНБ",
+        "admin_btn_levels": "⭐ Налаштування рівнів",
+        "admin_btn_referral_fee": "🤝 Комісія рефералів",
+        "admin_checkers_btn_disable": "Вимкнути",
+        "admin_checkers_btn_enable": "Увімкнути / Вимкнути",
+        "admin_checkers_btn_rules": "Правила",
+        "admin_checkers_chat_off": "Шашки в «{title}»: увімкнути",
+        "admin_checkers_chat_on": "Шашки в «{title}»: вимкнути",
+        "admin_checkers_enable_title": "⚪️ Шашки ⚫️\n\nОберіть чат, щоб увімкнути або вимкнути гру:",
+        "admin_checkers_fee_title": "⚪️ <b>Комісія шашок</b> ⚫️\n\nПоточне значення: <b>{percent}%</b>\n\nВведіть новий відсоток:",
+        "admin_checkers_fee_updated": "✅ Комісію шашок оновлено: <b>{percent}%</b>",
+        "admin_checkers_rules_empty": "Правила ще не задані.",
+        "admin_checkers_rules_prompt": "Введіть правила шашок російською. Бот збереже їх і перекладе для інших мов.",
+        "admin_checkers_rules_title": "⚪️ Правила шашок ⚫️\n\n{rules}",
+        "admin_checkers_title": "⚪️ Шашки ⚫️\n\nкомісія: {commission}%\n\nУсього ігор у шашки: {total_games}\nПрибуток з комісії: {commission_sum} PLN",
+        "admin_kmb_btn_enable": "Увімкнути / Вимкнути",
+        "admin_kmb_btn_rules": "Правила",
+        "admin_kmb_chat_off": "КНБ в «{title}»: увімкнути",
+        "admin_kmb_chat_on": "КНБ в «{title}»: вимкнути",
+        "admin_kmb_enable_title": "👊✌️🤚 КНБ 👊✌️🤚\n\nОберіть чат, щоб увімкнути або вимкнути гру:",
+        "admin_kmb_fee_title": "👊✌️🤚 <b>Комісія КНБ</b>\n\nПоточне значення: <b>{percent}%</b>\n\nВведіть новий відсоток:",
+        "admin_kmb_fee_updated": "✅ Комісію КНБ оновлено: <b>{percent}%</b>",
+        "admin_kmb_rules_empty": "Правила ще не задані.",
+        "admin_kmb_rules_prompt": "Введіть правила КНБ:",
+        "admin_kmb_rules_saved": "✅ Правила КНБ збережено.",
+        "admin_kmb_rules_title": "Правила КНБ\n\n{rules}",
+        "admin_kmb_title": "КНБ\n\nКомісія: {commission}%\n\nУнікальних користувачів: {unique_users}\nУсього ігор у КНБ: {total_games}\nПрибуток з комісії: {commission_sum} PLN",
+        "admin_levels_btn_disable": "Вимкнути",
+        "admin_levels_btn_enable": "Увімкнути",
+        "admin_levels_btn_referral": "Бонус рефералів",
+        "admin_levels_btn_required": "Умова отримання",
+        "admin_levels_btn_reward": "Нагорода на баланс",
+        "admin_levels_btn_title": "Назва",
+        "admin_levels_btn_withdraw": "Знижка на вивід",
+        "admin_levels_detail": (
+            "⭐ <b>Рівень {level}</b>\n\n"
+            "Назва: <b>{title}</b>\n"
+            "Статус: {status}\n\n"
+            "Потрібно виграних ставок: <b>{required} PLN</b>\n"
+            "Нагорода на баланс: <b>{reward} PLN</b>\n"
+            "Знижка до комісії виводу: <b>{withdraw}%</b>\n"
+            "Надбавка до реферального %: <b>{referral}%</b>"
+        ),
+        "admin_levels_invalid_amount": "❌ Введіть додатне число або 0.",
+        "admin_levels_invalid_percent": "❌ Введіть відсоток від 0 до 100.",
+        "admin_levels_invalid_text": "❌ Текст не може бути порожнім.",
+        "admin_levels_not_found": "❌ Рівень не знайдено.",
+        "admin_levels_prompt_referral": "Введіть надбавку до реферального відсотка за рівень {level} (0-100):",
+        "admin_levels_prompt_required": "Введіть суму виграних ставок для отримання рівня {level}:",
+        "admin_levels_prompt_reward": "Введіть нагороду на баланс за рівень {level}:",
+        "admin_levels_prompt_title": "Введіть назву для рівня {level}:",
+        "admin_levels_prompt_withdraw": "Введіть знижку до комісії виводу за рівень {level} (0-100):",
+        "admin_levels_saved": "✅ Збережено.",
+        "admin_levels_status_off": "⚪ вимкнено",
+        "admin_levels_status_on": "🟢 увімкнено",
+        "admin_levels_title": "⭐ <b>Налаштування рівнів</b>\n\nОберіть рівень для редагування:",
+        "admin_referral_fee_title": "🤝 <b>Комісія рефералів</b>\n\nПоточне значення: <b>{percent}%</b>\n\nВведіть новий відсоток:",
+        "admin_referral_fee_updated": "✅ Комісію рефералів оновлено: <b>{percent}%</b>",
+        "admin_user_amount_invalid": "❌ Введіть додатну суму.",
+        "admin_user_banned": "Користувача заблоковано.",
+        "admin_user_btn_ban": "🚫 Заблокувати",
+        "admin_user_btn_find_other": "🔎 Знайти іншого користувача",
+        "admin_user_btn_referral_percent": "🤝 Змінити реферальний %",
+        "admin_user_btn_topup": "💳 Поповнити баланс",
+        "admin_user_btn_unban": "✅ Розблокувати",
+        "admin_user_btn_withdraw_percent": "💸 Змінити комісію на вивід",
+        "admin_user_card": (
+            "👤 <b>{label}</b>\n\n"
+            "ID: <code>{user_id}</code>\n"
+            "Username: {username}\n"
+            "Статус: {status}\n"
+            "Баланс: <b>{balance} PLN</b>\n"
+            "Рівень: <b>{level}</b>\n"
+            "Виграних ставок для рівня: {level_progress} PLN\n"
+            "Бонус рівня: вивід −{level_withdraw_discount}%, реферали +{level_referral_bonus}%\n"
+            "Мова: {language}\n"
+            "Запросив: {referrer}\n\n"
+            "Комісія виводу: <b>{withdraw_percent}%</b> ({withdraw_source})\n"
+            "Реферальний %: <b>{referral_percent}%</b> ({referral_source})\n\n"
+            "Рефералів: {referrals_count}\n"
+            "Прибуток від рефералів: {referrals_profit} PLN"
+        ),
+        "admin_user_not_found": "❌ Користувача не знайдено. Введіть ID або username ще раз.",
+        "admin_user_percent_global": "загальна {percent}%",
+        "admin_user_percent_invalid": "❌ Введіть відсоток від 0 до 100 або <code>-</code> для скидання.",
+        "admin_user_percent_personal": "персональна {percent}%",
+        "admin_user_percent_reset": "без персональних налаштувань",
+        "admin_user_referral_bonus": "загальна {global_percent}% + надбавка {bonus}%",
+        "admin_user_referral_done": "✅ Надбавку до реферального відсотка оновлено: <b>{percent}</b>.",
+        "admin_user_referral_prompt": (
+            "Введіть надбавку до реферального відсотка для {user} / <code>{user_id}</code>.\n\n"
+            "Приклад: якщо загальний реферальний відсоток 1%, а ви введете <code>1</code>, підсумок буде 2%.\n\n"
+            "Надішліть відсоток від 0 до 100 або <code>-</code>, щоб прибрати персональну надбавку."
+        ),
+        "admin_user_search_prompt": "👥 Введіть ID користувача або username:",
+        "admin_user_status_active": "🟢 активний",
+        "admin_user_status_banned": "🔴 заблокований",
+        "admin_user_topup_done": "✅ Баланс поповнено на <b>{amount} PLN</b>.",
+        "admin_user_topup_prompt": "Введіть суму поповнення для {user} / <code>{user_id}</code>:",
+        "admin_user_unbanned": "Користувача розблоковано.",
+        "admin_user_withdraw_discount": "загальна {global_percent}% − знижка {discount}%",
+        "admin_user_withdraw_done": "✅ Знижку до комісії виводу оновлено: <b>{percent}</b>.",
+        "admin_user_withdraw_prompt": (
+            "Введіть знижку до комісії виводу для {user} / <code>{user_id}</code>.\n\n"
+            "Приклад: якщо загальна комісія 10%, а ви введете <code>1</code>, підсумок буде 9%.\n\n"
+            "Надішліть відсоток від 0 до 100 або <code>-</code>, щоб прибрати персональну знижку."
+        ),
+        "checkers_active_notice": "У вас уже є активна гра або пошук гри.",
+        "checkers_bad_move": "Так ходити не можна.",
+        "checkers_board_text": "⚪️ <b>Шашки</b> ⚫️\n⚪ {white}\n⚫ {black}\n\nБанк: {amount} PLN\nХід: {turn}",
+        "checkers_btn_accept": "Прийняти гру",
+        "checkers_choose_chat": "Оберіть чат для гри в шашки:",
+        "checkers_choose_topic": "Оберіть ігрову кімнату (🟢 вільна, 🔴 зайнята):",
+        "checkers_confirm": "Ставка: {amount} PLN\nСума виграшу: {win} PLN\nПочати пошук суперника?",
+        "checkers_decide_white": "{players} — киньте кубик 🎲 по одному разу. У кого більше, грає білими.",
+        "checkers_disabled": "Гру в шашки тимчасово вимкнено.",
+        "checkers_draw_countdown": (
+            "У грі вже {no_capture} ходів не було жодного взяття.\n"
+            "Якщо протягом 10 ходів (по 5 на кожного) не буде взяття, буде нічия.\n\n"
+            "До нічиї залишилось ходів: {remaining}"
+        ),
+        "checkers_draw_countdown_reset": "Шашку взяли. Відлік до нічиї скинуто.",
+        "checkers_draw_result": "Гру завершено.\nНічия.\n\nСтавку {amount} PLN повернуто обом гравцям.",
+        "checkers_enter_bet": "<b>{chat}</b>\nВаш баланс: {balance} PLN\nВведіть суму ставки:",
+        "checkers_flood_wait": "Занадто швидко. Зачекайте {seconds} с.",
+        "checkers_match_prize": "Сума виграшу: {win} PLN",
+        "checkers_match_rules_heading": "Правила гри:",
+        "checkers_match_started_in_topic": "Гру в шашки розпочато в {room}",
+        "checkers_match_title": "Гра в шашки",
+        "checkers_not_your_turn": "Зараз не ваш хід.",
+        "checkers_rules_body": (
+            "Білі ходять першими. Шашки ходять по діагоналі, обов'язкове взяття потрібно виконувати. "
+            "Дамка ходить по діагоналі на будь-яку відстань. Якщо гравець не зробить хід за 2 хвилини, він програє."
+        ),
+        "checkers_search_cancelled_refund": "Скасовано.\nСуму ставки повернуто на баланс.",
+        "checkers_search_post": "{user} шукає суперника в шашки.\nСтавка: {amount} PLN\nСума виграшу: {win} PLN",
+        "checkers_search_started": "Пошук гри в шашки розпочато. Ставку {amount} PLN списано.",
+        "checkers_search_timeout": "Ніхто не прийняв гру в шашки. Ставку {amount} PLN повернуто на баланс.",
+        "checkers_turn_timeout_result": "Час на хід вичерпано.\n{loser} програв.\n\nПереможець: {winner}\nВиграш {payout} PLN зараховано на баланс.",
+        "checkers_turn_timeout_warning": "{name}, у вас залишилась 1 хвилина на хід, інакше ви програєте.",
+        "checkers_white_chosen": "{name} грає білими. Гра починається.",
+        "checkers_winner": "Гру завершено.\nПереможець: {name}\n\nВиграш {payout} PLN зараховано на баланс.",
+        "kmb_btn_accept": "Прийняти гру",
+        "kmb_choice_saved": "Вибір прийнято.",
+        "kmb_choose_chat": "Оберіть чат для гри в КНБ:",
+        "kmb_choose_topic": "Оберіть ігрову кімнату (🟢 вільна, 🔴 зайнята):",
+        "kmb_confirm": "Гра до {wins} перемог\nСтавка: {amount} PLN\nСума виграшу: {win} PLN\nПочати пошук суперника?",
+        "kmb_enter_bet": "<b>{chat}</b>\nВаш баланс: {balance} PLN\nВведіть суму ставки:",
+        "kmb_enter_wins": "<b>{chat}</b>\nДо скількох перемог граємо?\nВведіть число від 1 до 10:",
+        "kmb_match_prize": "Сума виграшу: {win} PLN",
+        "kmb_match_rules_heading": "Правила гри:",
+        "kmb_match_started_in_topic": "Гру в Камінь/Ножиці/Папір розпочато в {room}",
+        "kmb_match_title": "Гра в Камінь / Ножиці / Папір",
+        "kmb_no_chats": "КНБ зараз недоступний: немає увімкнених чатів або тем.",
+        "kmb_not_your_game": "Це не ваша гра.",
+        "kmb_pick_done": "вибір зроблено",
+        "kmb_pick_prompt": (
+            "👊✌️🤚 <b>КНБ</b>\n\n"
+            "Гра до {wins} перемог\n"
+            "Рахунок: {p1_score} - {p2_score}\n\n"
+            "{p1}: {p1_status}\n"
+            "{p2}: {p2_status}\n\n"
+            "Оберіть: камінь, ножиці чи папір."
+        ),
+        "kmb_pick_wait": "очікує вибору",
+        "kmb_result_draw": (
+            "Нічия.\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Рахунок: {p1_score} - {p2_score}\n"
+            "Гра до {wins} перемог.\n\n"
+            "Оберіть ще раз."
+        ),
+        "kmb_result_win": (
+            "Гру завершено.\n"
+            "Фінальний рахунок: {p1_score} - {p2_score}\n\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Переможець: {winner}\n"
+            "Виграш {payout} PLN зараховано на баланс."
+        ),
+        "kmb_round_win": (
+            "Раунд завершено.\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Раунд виграв: {winner}\n"
+            "Рахунок: {p1_score} - {p2_score}\n\n"
+            "Гра до {wins} перемог. Оберіть ще раз."
+        ),
+        "kmb_rules_body": (
+            "Камінь б'є ножиці, ножиці ріжуть папір, папір накриває камінь. "
+            "При однаковому виборі раунд — нічия і переграється."
+        ),
+        "kmb_search_cancelled_refund": "Скасовано.\nСуму ставки повернуто на баланс.",
+        "kmb_search_post": "{user} шукає суперника в КНБ.\nГра до {wins} перемог\nСтавка: {amount} PLN\nСума виграшу: {win} PLN",
+        "kmb_search_started": "Пошук гри в КНБ розпочато. Гра до {wins} перемог. Ставку {amount} PLN списано.",
+        "kmb_search_timeout": "Ніхто не прийняв гру в КНБ. Ставку {amount} PLN повернуто на баланс.",
+        "kmb_wins_invalid": "Невірна кількість перемог. Введіть число від 1 до 10.",
         "btn_signup": "Записатися на гру",
         "main_menu_chat_fallback": "💬 Чат",
         "btn_play_21_bot": "Грати в 21",
@@ -1412,7 +1881,7 @@ TEXTS: dict[str, dict[str, str]] = {
         ),
         "admin_slot_btn_enable": "Увімкнути",
         "admin_slot_btn_disable": "Вимкнути",
-        "admin_slot_btn_rules": "Правило",
+        "admin_slot_btn_rules": "Правила",
         "admin_slot_rules_prompt": "Введіть правило для Слота:",
         "admin_slot_rules_current": "Поточне правило:\n{rules}",
         "admin_slot_rules_empty": "❌ Правило не може бути порожнім. Введіть текст правила.",
@@ -1430,14 +1899,14 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_kmb": "🪖 КМБ",
         "admin_btn_stats": "📊 Статистика",
         "admin_stats_title": "📊 <b>Статистика</b>",
-        "admin_stats_btn_users": "👥 Пользователи",
+        "admin_stats_btn_users": "👥 Користувачі",
         "admin_stats_users_title": (
-            "👥 <b>Пользователи</b>\n\n"
-            "Всего пользователей: {total}\n"
-            "Активных: {active}\n"
-            "Заблокированных: {banned}\n"
-            "С балансом: {with_balance}\n"
-            "Общий баланс: {balance_sum} PLN"
+            "👥 <b>Користувачі</b>\n\n"
+            "Усього користувачів: {total}\n"
+            "Активних: {active}\n"
+            "Заблокованих: {banned}\n"
+            "З балансом: {with_balance}\n"
+            "Загальний баланс: {balance_sum} PLN"
         ),
         "admin_btn_bot_settings": "⚙️ Налаштування бота",
         "admin_games_title": "🎯 <b>Ігри</b>",
@@ -1665,7 +2134,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_game_forum_reload_lost": "⚠️ Сесію скинуто. Почніть створення гри знову.",
         "admin_game_topic_forbidden": "Неможливо обрати цю тему: її немає в списку дозволених для цього чату.",
         "admin_game_pick_type": "🎯 <b>Тип гри</b>\n\nОберіть вид кидка:",
-        "admin_game_type_dice": "🎲 Кубики",
+        "admin_game_type_dice": "🎲 Кості",
         "admin_game_type_bowling": "🎳 Боулінг",
         "admin_game_type_darts": "🎯 Дартс",
         "admin_game_type_any": "🎲 🎳 🎯 (будь-який кидок)",
@@ -1709,7 +2178,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_game_detail_participants_count": "Записалось: <b>{count}/{max}</b> (мін. {min})",
         "admin_game_status_draft": "очікує старту",
         "admin_game_status_active": "йде зараз",
-        "admin_game_status_finished": "завершена",
+        "admin_game_status_finished": "завершено",
         "admin_game_status_cancelled": "скасована",
         # ---- Announcement ----
         "game_announce_title": "🎯 Гра для <b>{chat}</b> створена",
@@ -1889,6 +2358,146 @@ TEXTS: dict[str, dict[str, str]] = {
         "cabinet_level": "⭐ Poziom: <b>{level}</b>",
         "cabinet_next_level": "📈 Do poziomu {level}: <b>{amount} PLN</b>",
         "cabinet_next_level_max": "📈 Następny poziom: <b>osiągnięto maksymalny poziom</b>",
+        "cabinet_referral_link": "🔗 Twój link polecający:\n<code>{link}</code>",
+        "btn_referral_program": "🤝 Program poleceń",
+        "btn_return_main": "powrót do menu głównego",
+        "btn_checkers": "⚪️ Warcaby ⚫️",
+        "btn_kmb": "👊✌️🤚 RPS 👊✌️🤚",
+        "input_cancel_hint": "wpisz /back, aby anulować",
+        "referral_empty": "Nie masz jeszcze poleconych.",
+        "referral_line": "• {name} — {profit} PLN",
+        "referral_program_text": "🤝 <b>Program polecający</b>\n\nTwój link:\n<code>{link}</code>\n\nWarunki: zaproś graczy za pomocą swojego linku i zdobądź <b>{percent}%</b> każdego zwycięskiego zakładu postawionego przez Twojego poleconego\n\n<b>Twoje polecenia:</b>\n{referrals}",
+        "admin_21_summary": "♠️ <b>Tryb 21</b>\n\n-------------------------------------------\nVs BOT:\n\nOpłata: {bot_fee}%\n\nŁączna liczba gier BOT: {bot_total}\nBOT wygrał: {bot_won_count} gier, {bot_won_sum} PLN\nBOT przegrał: {bot_lost_count} gier, {bot_lost_sum} PLN\nRemisy: {bot_draw_count}\n\nZysk BOT: {bot_profit_sum} PLN\n\n-------------------------------------------\nPvP:\n\nOpłata: {users_fee}%\n\nCałkowita liczba gier PvP: {pvp_total}\nZysk z prowizji: {pvp_commission_sum} PLN\n\n-------------------------------------------\nŁączny zysk: {total_profit_sum} PLN",
+        "admin_btn_checkers_fee": "⚪️ Opłata — warcaby ⚫️",
+        "admin_btn_kmb_fee": "👊✌️🤚 Opłata RPS",
+        "admin_btn_levels": "⭐ Ustawienia poziomu",
+        "admin_btn_referral_fee": "🤝 Opłata za polecenie",
+        "admin_checkers_btn_disable": "Wyłączyć",
+        "admin_checkers_btn_enable": "Włącz / wyłącz",
+        "admin_checkers_btn_rules": "Zasady",
+        "admin_checkers_chat_off": "Warcaby w «{title}»: WŁ",
+        "admin_checkers_chat_on": "Warcaby w «{title}»: WYŁ",
+        "admin_checkers_enable_title": "⚪️ Warcaby ⚫️\n\nWybierz czat, aby włączyć lub wyłączyć grę:",
+        "admin_checkers_fee_title": "⚪️ <b>Opłata za warcaby</b> ⚫️\n\nObecnie: <b>{percent}%</b>\n\nWprowadź nowy procent:",
+        "admin_checkers_fee_updated": "✅ Zaktualizowano opłatę za warcaby: <b>{percent}%</b>",
+        "admin_checkers_rules_empty": "Zasady nie są jeszcze ustalone.",
+        "admin_checkers_rules_prompt": "Wprowadź zasady gry w warcaby w języku rosyjskim. Bot je zapisze i przetłumaczy na inne języki.",
+        "admin_checkers_rules_title": "⚪️ Zasady warcabów ⚫️\n\n{rules}",
+        "admin_checkers_title": "⚪️ Warcaby ⚫️\n\nProwizja: {commission}%\n\nŁącznie gier: {total_games}\nZysk z prowizji: {commission_sum} PLN",
+        "admin_kmb_btn_enable": "Włącz / wyłącz",
+        "admin_kmb_btn_rules": "Zasady",
+        "admin_kmb_chat_off": "RPS w «{title}»: WŁ",
+        "admin_kmb_chat_on": "RPS w «{title}»: WYŁ",
+        "admin_kmb_enable_title": "👊✌️🤚 RPS 👊✌️🤚\n\nWybierz czat, aby włączyć lub wyłączyć grę:",
+        "admin_kmb_fee_title": "👊✌️🤚 <b>Opłata RPS</b>\n\nObecnie: <b>{percent}%</b>\n\nWprowadź nowy procent:",
+        "admin_kmb_fee_updated": "✅ Zaktualizowano opłatę RPS: <b>{percent}%</b>",
+        "admin_kmb_rules_empty": "Zasady nie są jeszcze ustalone.",
+        "admin_kmb_rules_prompt": "Wprowadź reguły RPS:",
+        "admin_kmb_rules_saved": "✅ Reguły RPS zapisane.",
+        "admin_kmb_rules_title": "Zasady RPS\n\n{rules}",
+        "admin_kmb_title": "RPS\n\nOpłata: {commission}%\n\nUnikalni użytkownicy: {unique_users}\nŁączna liczba gier RPS: {total_games}\nZysk z prowizji: {commission_sum} PLN",
+        "admin_levels_btn_disable": "Wyłączyć",
+        "admin_levels_btn_enable": "Włączać",
+        "admin_levels_btn_referral": "Bonus za polecenie",
+        "admin_levels_btn_required": "Wymóg",
+        "admin_levels_btn_reward": "Bilans nagrody",
+        "admin_levels_btn_title": "Tytuł",
+        "admin_levels_btn_withdraw": "Wycofaj rabat",
+        "admin_levels_detail": "⭐ <b>Poziom {level}</b>\n\nTytuł: <b>{title}</b>\nStan: {status}\n\nWymagane zwycięskie zakłady: <b>{required} PLN</b>\nNagroda za saldo: <b>{reward} PLN</b>\nZniżka za wypłatę: <b>{withdraw}%</b>\nBonus za polecenie %: <b>{referral}%</b>",
+        "admin_levels_invalid_amount": "❌ Wpisz liczbę dodatnią lub 0.",
+        "admin_levels_invalid_percent": "❌ Wprowadź procent od 0 do 100.",
+        "admin_levels_invalid_text": "❌ Tekst nie może być pusty.",
+        "admin_levels_not_found": "❌ Nie znaleziono poziomu.",
+        "admin_levels_prompt_referral": "Podaj % premii za polecenie dla poziomu {level} (0-100):",
+        "admin_levels_prompt_required": "Wpisz zwycięską sumę zakładu wymaganą dla poziomu {level}:",
+        "admin_levels_prompt_reward": "Podaj nagrodę salda dla poziomu {level}:",
+        "admin_levels_prompt_title": "Wpisz tytuł poziomu {level}:",
+        "admin_levels_prompt_withdraw": "Wprowadź zniżkę za wypłatę dla poziomu {level} (0-100):",
+        "admin_levels_saved": "✅ Zapisano.",
+        "admin_levels_status_off": "⚪ wyłączony",
+        "admin_levels_status_on": "🟢 włączony",
+        "admin_levels_title": "⭐ <b>Ustawienia poziomu</b>\n\nWybierz poziom do edycji:",
+        "admin_referral_fee_title": "🤝 <b>Opłata za polecenie</b>\n\nObecnie: <b>{percent}%</b>\n\nWprowadź nowy procent:",
+        "admin_referral_fee_updated": "✅ Zaktualizowano opłatę za polecenie: <b>{percent}%</b>",
+        "admin_user_amount_invalid": "❌ Wpisz kwotę dodatnią.",
+        "admin_user_banned": "Użytkownik zbanowany.",
+        "admin_user_btn_ban": "🚫 Zablokuj",
+        "admin_user_btn_find_other": "🔎 Znajdź innego użytkownika",
+        "admin_user_btn_referral_percent": "🤝 Zmień % poleceń",
+        "admin_user_btn_topup": "💳 Uzupełnij saldo",
+        "admin_user_btn_unban": "✅ Odblokuj",
+        "admin_user_btn_withdraw_percent": "💸 Zmień opłatę za wypłatę",
+        "admin_user_card": "👤 <b>{label}</b>\n\nIdentyfikator: <code>{user_id}</code>\nNazwa użytkownika: {username}\nStan: {status}\nSaldo: <b>{balance} PLN</b>\nPoziom: <b>{level}</b>\nWygrane zakłady w kierunku poziomu: {level_progress} PLN\nBonus za poziom: wypłata −{level_withdraw_discount}%, polecenie +{level_referral_bonus}%\nJęzyk: {language}\nZaproszony przez: {referrer}\n\nOpłata za wypłatę: <b>{withdraw_percent}%</b> ({withdraw_source})\n% poleceń: <b>{referral_percent}%</b> ({referral_source})\n\nPolecenia: {referrals_count}\nZysk z poleconych: {referrals_profit} PLN",
+        "admin_user_not_found": "❌ Nie znaleziono użytkownika. Wprowadź ponownie identyfikator lub nazwę użytkownika.",
+        "admin_user_percent_global": "globalny {percent}%",
+        "admin_user_percent_invalid": "❌ Wprowadź procent 0–100 lub <code>-</code>, aby zresetować.",
+        "admin_user_percent_personal": "osobiste {percent}%",
+        "admin_user_percent_reset": "żadnych osobistych zmian",
+        "admin_user_referral_bonus": "globalne {global_percent}% + premia {bonus}%",
+        "admin_user_referral_done": "✅ Zaktualizowano bonus za polecenie: <b>{percent}</b>.",
+        "admin_user_referral_prompt": "Wprowadź premię za polecenie dla {user} / <code>{user_id}</code>.\n\nPrzykład: jeśli globalne polecenie wynosi 1% i wyślesz <code>1</code>, skuteczność wynosi 2%.\n\nWyślij procent 0–100 lub <code>-</code>, aby usunąć bonus osobisty.",
+        "admin_user_search_prompt": "👥 Wpisz identyfikator użytkownika lub nazwę użytkownika:",
+        "admin_user_status_active": "🟢 aktywny",
+        "admin_user_status_banned": "🔴 zablokowany",
+        "admin_user_topup_done": "✅ Saldo doładowane o <b>{amount} PLN</b>.",
+        "admin_user_topup_prompt": "Podaj kwotę doładowania dla {user} / <code>{user_id}</code>:",
+        "admin_user_unbanned": "Użytkownik odblokowany.",
+        "admin_user_withdraw_discount": "globalne {global_percent}% − rabat {discount}%",
+        "admin_user_withdraw_done": "✅ Zaktualizowano rabat za wypłatę: <b>{percent}</b>.",
+        "admin_user_withdraw_prompt": "Wpisz zniżkę do prowizji za wypłatę dla {user} / <code>{user_id}</code>.\n\nPrzykład: jeśli globalna prowizja to 10%, a wyślesz <code>1</code>, w praktyce jest 9%.\n\nWyślij procent 0–100 lub <code>-</code>, aby usunąć osobistą zniżkę.",
+        "checkers_active_notice": "Masz już aktywną grę lub wyszukiwanie.",
+        "checkers_bad_move": "Ten ruch jest niedozwolony.",
+        "checkers_board_text": "⚪️ <b>Warcaby</b> ⚫️\n⚪ {white}\n⚫ {black}\n\nPula: {amount} PLN\nTura: {turn}",
+        "checkers_btn_accept": "Zaakceptuj grę",
+        "checkers_choose_chat": "Wybierz czat dla warcabów:",
+        "checkers_choose_topic": "Wybierz pokój gier (🟢 wolny, 🔴 zajęty):",
+        "checkers_confirm": "Zakład: {amount} PLN\nKwota wygranej: {win} PLN\nRozpocząć wyszukiwanie przeciwnika?",
+        "checkers_decide_white": "{players} — rzućcie kością 🎲 po jednym razie. Wyższy wynik gra białymi.",
+        "checkers_disabled": "Warcaby są tymczasowo wyłączone.",
+        "checkers_draw_countdown": "Brak przejęcia dla {no_capture} ruchów.\nJeśli w ciągu następnych 10 ruchów (po 5 na stronę) nie zostanie zbity, będzie remis.\n\nRuchy do remisu: {remaining}",
+        "checkers_draw_countdown_reset": "Zbicie pionka. Licznik remisu został zresetowany.",
+        "checkers_draw_result": "Koniec gry.\nRemis.\n\nStawka {amount} PLN zwrócona obu graczom.",
+        "checkers_enter_bet": "<b>{chat}</b>\nTwoje saldo: {balance} PLN\nWpisz kwotę zakładu:",
+        "checkers_flood_wait": "Za szybko. Poczekaj {seconds} s.",
+        "checkers_match_prize": "Kwota wygranej: {win} PLN",
+        "checkers_match_rules_heading": "Zasady:",
+        "checkers_match_started_in_topic": "Warcaby rozpoczęły się w {room}",
+        "checkers_match_title": "Warcaby",
+        "checkers_not_your_turn": "Nie twoja kolej.",
+        "checkers_rules_body": "Białe poruszają się pierwsze. Kawałki poruszają się po przekątnej; przechwytywanie jest obowiązkowe. Królowie poruszają się na dowolną odległość po przekątnej. Jeśli nie wykonasz ruchu w ciągu 2 minut, przegrywasz.",
+        "checkers_search_cancelled_refund": "Anulowano.\nStawka wróciła na saldo.",
+        "checkers_search_post": "{user} szuka warcabowego przeciwnika.\nZakład: {amount} PLN\nKwota wygranej: {win} PLN",
+        "checkers_search_started": "Rozpoczęło się wyszukiwanie warcabów. Zakład {amount} PLN odliczony.",
+        "checkers_search_timeout": "Nikt nie przyjął. Zakład {amount} PLN wrócił do salda.",
+        "checkers_turn_timeout_result": "Czas minął.\n{loser} przegrał(a).\n\nZwycięzca: {winner}\n{payout} PLN zaksięgowano na saldo.",
+        "checkers_turn_timeout_warning": "{name}, masz 1 minutę na ruch, inaczej przegrywasz.",
+        "checkers_white_chosen": "{name} gra białymi. Rozpoczyna się gra.",
+        "checkers_winner": "Koniec gry.\nZwycięzca: {name}\n\n{payout} PLN zaksięgowano na saldo.",
+        "kmb_btn_accept": "Zaakceptuj grę",
+        "kmb_choice_saved": "Wybór zapisany.",
+        "kmb_choose_chat": "Wybierz czat dla RPS:",
+        "kmb_choose_topic": "Wybierz pokój gier (🟢 wolny, 🔴 zajęty):",
+        "kmb_confirm": "Pierwszy do {wins} wygrywa\nZakład: {amount} PLN\nKwota wygranej: {win} PLN\nRozpocząć wyszukiwanie?",
+        "kmb_enter_bet": "<b>{chat}</b>\nTwoje saldo: {balance} PLN\nWpisz kwotę zakładu:",
+        "kmb_enter_wins": "<b>{chat}</b>\nZagraj jako pierwszy do ilu wygranych?\nWpisz 1–10:",
+        "kmb_match_prize": "Kwota wygranej: {win} PLN",
+        "kmb_match_rules_heading": "Zasady:",
+        "kmb_match_started_in_topic": "Kamień/Papier/Nożyce rozpoczęły się w {room}",
+        "kmb_match_title": "Kamień / Papier / Nożyce",
+        "kmb_no_chats": "RPS niedostępny: brak włączonych czatów i tematów.",
+        "kmb_not_your_game": "To nie jest twoja gra.",
+        "kmb_pick_done": "dokonany wybór",
+        "kmb_pick_prompt": "👊✌️🤚 <b>RPS</b>\n\nPierwszy do {wins} wygrywa\nWynik: {p1_score} - {p2_score}\n\n{p1}: {p1_status}\n{p2}: {p2_status}\n\nWybierz kamień, nożyczki lub papier.",
+        "kmb_pick_wait": "czeka na wybór",
+        "kmb_result_draw": "Remis.\n{p1}: {p1_choice}\n{p2}: {p2_choice}\n\nWynik: {p1_score} - {p2_score}\nGra do {wins} zwycięstw.\n\nWybierz ponownie.",
+        "kmb_result_win": "Koniec gry.\nWynik końcowy: {p1_score} - {p2_score}\n\n{p1}: {p1_choice}\n{p2}: {p2_choice}\n\nZwycięzca: {winner}\n{payout} PLN zaksięgowano na saldo.",
+        "kmb_round_win": "Runda zakończona.\n{p1}: {p1_choice}\n{p2}: {p2_choice}\n\nZwycięzca rundy: {winner}\nWynik: {p1_score} - {p2_score}\n\nGra do {wins} zwycięstw. Wybierz ponownie.",
+        "kmb_rules_body": "Kamień bije nożyce, nożyce tną papier, papier przykrywa kamień. Ten sam wybór to remis i runda jest powtarzana.",
+        "kmb_search_cancelled_refund": "Anulowano.\nStawka wróciła na saldo.",
+        "kmb_search_post": "{user} szuka przeciwnika RPS.\nPierwszy do {wins} wygrywa\nZakład: {amount} PLN\nKwota wygranej: {win} PLN",
+        "kmb_search_started": "Rozpoczęło się wyszukiwanie RPS. Pierwszy do {wins} wygrywa. Zakład {amount} PLN odliczony.",
+        "kmb_search_timeout": "Nikt nie przyjął. Zakład {amount} PLN wrócił do salda.",
+        "kmb_wins_invalid": "Nieprawidłowa liczba wygranych. Wpisz 1–10.",
         "btn_signup": "Zapisz się na grę",
         "main_menu_chat_fallback": "💬 Czat",
         "btn_play_21_bot": "Graj w 21",
@@ -1919,8 +2528,8 @@ TEXTS: dict[str, dict[str, str]] = {
         ),
         "admin_slot_btn_enable": "Włącz",
         "admin_slot_btn_disable": "Wyłącz",
-        "admin_slot_btn_rules": "Zasada",
-        "admin_slot_rules_prompt": "Wpisz zasadę dla Slotu:",
+        "admin_slot_btn_rules": "Zasady",
+        "admin_slot_rules_prompt": "Wpisz zasady dla Slotu:",
         "admin_slot_rules_current": "Aktualna zasada:\n{rules}",
         "admin_slot_rules_empty": "❌ Zasada nie może być pusta. Wpisz tekst zasady.",
         "admin_slot_rules_saved": "✅ Zasada Slotu zapisana.",

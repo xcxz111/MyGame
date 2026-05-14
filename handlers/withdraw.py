@@ -8,6 +8,7 @@ from aiogram import Bot, F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
@@ -241,7 +242,12 @@ async def on_withdraw_confirm_yes(
         await callback.answer("⛔ Сессия истекла, начните заново", show_alert=True)
         return
 
-    balance = user.balance or Decimal("0")
+    u = (
+        await session.execute(
+            select(User).where(User.user_id == user.user_id).with_for_update()
+        )
+    ).scalar_one()
+    balance = u.balance or Decimal("0")
     if amount > balance:
         await state.clear()
         await callback.answer(
@@ -262,14 +268,14 @@ async def on_withdraw_confirm_yes(
     fee_amount, payout = _calc_payout(amount, fee_percent)
 
     # списываем сумму с баланса
-    user.balance = (user.balance or Decimal("0.00")) - amount
+    u.balance = (u.balance or Decimal("0.00")) - amount
     await session.flush()
     await payment_logs_repo.log(
         session,
         user_id=user.user_id,
         method=PaymentLogMethod.WITHDRAW,
         amount=-amount,
-        balance_after=user.balance,
+        balance_after=u.balance,
     )
     withdrawal = await withdrawals_repo.create(
         session,

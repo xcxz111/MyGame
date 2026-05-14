@@ -104,6 +104,8 @@ async def _available_chats(bot: Bot, session: AsyncSession) -> list[tuple[int, s
     rows = await app_chats_repo.get_all(session)
     out: list[tuple[int, str]] = []
     for c in rows:
+        if not int(c.kmb_enabled or 0):
+            continue
         try:
             chat = await bot.get_chat(c.chat_id)
             title = chat.title or str(c.chat_id)
@@ -136,6 +138,9 @@ async def _present_kmb_topics(
     cid: int,
     back_callback_data: str = "menu:kmb",
 ) -> str:
+    row = await app_chats_repo.get_by_chat_id(session, cid)
+    if row is None or not bool(row.kmb_enabled):
+        return "no_chat"
     allowed = await allowed_topics_repo.effective_allowed_public_threads(session, cid)
     if allowed == frozenset():
         return "no_chat"
@@ -426,6 +431,10 @@ async def on_kmb_topic(
     except (ValueError, IndexError):
         await callback.answer()
         return
+    row = await app_chats_repo.get_by_chat_id(session, cid)
+    if row is None or not bool(row.kmb_enabled):
+        await callback.answer(t("kmb_no_chats", lang), show_alert=True)
+        return
     thread_id = None if tid_raw == 0 else tid_raw
     if not await allowed_topics_repo.is_allowed_public(session, cid, thread_id):
         await callback.answer(t("game21_pvp_topic_forbidden", lang), show_alert=True)
@@ -532,6 +541,10 @@ async def on_kmb_confirm_yes(
     win = possible_win_pvp(bet, commission)
     async with user_lock(user.user_id):
         async with lock_for_chat(chat_id, thread_id):
+            row = await app_chats_repo.get_by_chat_id(session, chat_id)
+            if row is None or not bool(row.kmb_enabled):
+                await callback.answer(t("kmb_no_chats", lang), show_alert=True)
+                return
             if user_in_any_interactive_game(user.user_id):
                 await callback.answer(t("game21_active_notice", lang), show_alert=True)
                 return
@@ -629,7 +642,7 @@ async def on_kmb_chat_command(message: Message, session: AsyncSession, user: Use
     async with user_lock(user.user_id):
         async with lock_for_chat(chat_id, thread_id):
             row = await app_chats_repo.get_by_chat_id(session, chat_id)
-            if row is None:
+            if row is None or not bool(row.kmb_enabled):
                 await message.reply(t("kmb_no_chats", lang))
                 return
             if thread_id is not None:
@@ -772,6 +785,10 @@ async def on_kmb_accept(callback: CallbackQuery, session: AsyncSession, user: Us
     bet = Decimal(str(req.get("bet_amount") or "0"))
     async with user_lock(callback.from_user.id):
         async with lock_for_chat(chat_id, thread_id):
+            row = await app_chats_repo.get_by_chat_id(session, chat_id)
+            if row is None or not bool(row.kmb_enabled):
+                await callback.answer(t("kmb_no_chats", lang), show_alert=True)
+                return
             if get_live(sk) or slot_busy_outside_kmb(chat_id, thread_id) or user_in_any_interactive_game(callback.from_user.id):
                 await callback.answer(t("game21_active_notice", lang), show_alert=True)
                 return

@@ -11,6 +11,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
@@ -152,6 +153,7 @@ async def on_menu_signup(
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
         show_checkers = await checkers_repo.is_enabled(session)
+        show_kmb = await app_chats_repo.any_kmb_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         await callback.message.edit_text(
             t("game_signup_no_games", lang),
@@ -162,6 +164,7 @@ async def on_menu_signup(
                 menu_chats=menu_chats,
                 show_game21=show_game21,
                 show_checkers=show_checkers,
+                show_kmb=show_kmb,
                 show_slot=show_slot,
             ),
         )
@@ -216,7 +219,7 @@ async def on_game_join(
     except ValueError:
         await callback.answer(t("game_signup_not_found", lang), show_alert=True)
         return
-    game = await games_repo.get(session, game_id)
+    game = await games_repo.get_draft_for_update(session, game_id)
     if game is None or game.status != GameStatus.DRAFT:
         await callback.answer(t("game_signup_not_draft", lang), show_alert=True)
         return
@@ -256,7 +259,12 @@ async def on_game_join(
     fee = game.entry_fee or Decimal("0")
     is_paid = bool(int(game.is_paid or 0)) and fee > Decimal("0")
     if is_paid:
-        bal = user.balance or Decimal("0")
+        locked_u = (
+            await session.execute(
+                select(User).where(User.user_id == user.user_id).with_for_update()
+            )
+        ).scalar_one()
+        bal = locked_u.balance or Decimal("0")
         if bal < fee:
             await callback.answer(
                 t("game_signup_low_balance", lang).format(
@@ -265,14 +273,14 @@ async def on_game_join(
                 show_alert=True,
             )
             return
-        user.balance = bal - fee
+        locked_u.balance = bal - fee
         await session.flush()
         await payment_logs_repo.log(
             session,
             user_id=user.user_id,
             method=PaymentLogMethod.GAME_ENTRY,
             amount=-fee,
-            balance_after=user.balance,
+            balance_after=locked_u.balance,
         )
     try:
         await gp_repo.register(session, game_id=game_id, user_id=user.user_id)
@@ -299,7 +307,7 @@ async def on_game_leave(
     except ValueError:
         await callback.answer(t("game_signup_not_found", lang), show_alert=True)
         return
-    game = await games_repo.get(session, game_id)
+    game = await games_repo.get_draft_for_update(session, game_id)
     if game is None or game.status != GameStatus.DRAFT:
         await callback.answer(t("game_signup_not_draft", lang), show_alert=True)
         return
@@ -309,14 +317,19 @@ async def on_game_leave(
     fee = game.entry_fee or Decimal("0")
     is_paid = bool(int(game.is_paid or 0)) and fee > Decimal("0")
     if is_paid:
-        user.balance = (user.balance or Decimal("0")) + fee
+        locked_u = (
+            await session.execute(
+                select(User).where(User.user_id == user.user_id).with_for_update()
+            )
+        ).scalar_one()
+        locked_u.balance = (locked_u.balance or Decimal("0")) + fee
         await session.flush()
         await payment_logs_repo.log(
             session,
             user_id=user.user_id,
             method=PaymentLogMethod.GAME_ENTRY_REFUND,
             amount=fee,
-            balance_after=user.balance,
+            balance_after=locked_u.balance,
         )
     await gp_repo.unregister(session, game_id=game_id, user_id=user.user_id)
     await callback.answer(t("game_signup_left", lang))

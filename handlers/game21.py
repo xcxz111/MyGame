@@ -602,6 +602,7 @@ async def on_play21_bot_confirm_no(
     menu_chats = await app_chats_repo.list_for_main_menu(session)
     show_game21 = await g21_repo.any_game21_enabled(session)
     show_checkers = await checkers_repo.is_enabled(session)
+    show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await _edit_text_skip_not_modified(
         callback.message,
@@ -613,6 +614,7 @@ async def on_play21_bot_confirm_no(
             menu_chats=menu_chats,
             show_game21=show_game21,
             show_checkers=show_checkers,
+            show_kmb=show_kmb,
             show_slot=show_slot,
         ),
     )

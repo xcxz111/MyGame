@@ -49,6 +49,7 @@ async def cmd_start(message: Message, session: AsyncSession, user: User) -> None
     menu_chats = await app_chats_repo.list_for_main_menu(session)
     show_game21 = await g21_repo.any_game21_enabled(session)
     show_checkers = await checkers_repo.is_enabled(session)
+    show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await message.answer(
         build_welcome_text(user.language_code, user.user_id, user.balance),
@@ -59,6 +60,7 @@ async def cmd_start(message: Message, session: AsyncSession, user: User) -> None
             menu_chats=menu_chats,
             show_game21=show_game21,
             show_checkers=show_checkers,
+            show_kmb=show_kmb,
             show_slot=show_slot,
         ),
     )
@@ -79,6 +81,7 @@ async def on_language_chosen(
     menu_chats = await app_chats_repo.list_for_main_menu(session)
     show_game21 = await g21_repo.any_game21_enabled(session)
     show_checkers = await checkers_repo.is_enabled(session)
+    show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await callback.message.edit_text(
         build_welcome_text(code, user.user_id, user.balance),
@@ -89,6 +92,7 @@ async def on_language_chosen(
             menu_chats=menu_chats,
             show_game21=show_game21,
             show_checkers=show_checkers,
+            show_kmb=show_kmb,
             show_slot=show_slot,
         ),
     )

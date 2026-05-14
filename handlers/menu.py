@@ -37,6 +37,7 @@ async def _send_main_menu_message(
     menu_chats = await app_chats_repo.list_for_main_menu(session)
     show_game21 = await g21_repo.any_game21_enabled(session)
     show_checkers = await checkers_repo.is_enabled(session)
+    show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await message.answer(
         build_welcome_text(lang, user.user_id, user.balance),
@@ -47,6 +48,7 @@ async def _send_main_menu_message(
             menu_chats=menu_chats,
             show_game21=show_game21,
             show_checkers=show_checkers,
+            show_kmb=show_kmb,
             show_slot=show_slot,
         ),
     )
@@ -89,6 +91,7 @@ async def on_menu_main(
     menu_chats = await app_chats_repo.list_for_main_menu(session)
     show_game21 = await g21_repo.any_game21_enabled(session)
     show_checkers = await checkers_repo.is_enabled(session)
+    show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     try:
         await callback.message.delete()
@@ -104,6 +107,7 @@ async def on_menu_main(
             menu_chats=menu_chats,
             show_game21=show_game21,
             show_checkers=show_checkers,
+            show_kmb=show_kmb,
             show_slot=show_slot,
         ),
     )

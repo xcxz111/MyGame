@@ -14,6 +14,26 @@ async def get(session: AsyncSession, game_id: int) -> Game | None:
     return await session.get(Game, game_id)
 
 
+async def get_active_for_update(session: AsyncSession, game_id: int) -> Game | None:
+    """Строка игры с блокировкой; только ACTIVE — для единоразовой выплаты призов."""
+    result = await session.execute(
+        select(Game)
+        .where(Game.id == int(game_id), Game.status == GameStatus.ACTIVE)
+        .with_for_update()
+    )
+    return result.scalar_one_or_none()
+
+
+async def get_draft_for_update(session: AsyncSession, game_id: int) -> Game | None:
+    """Строка игры с блокировкой; только DRAFT — запись/выход без гонок по местам и взносу."""
+    result = await session.execute(
+        select(Game)
+        .where(Game.id == int(game_id), Game.status == GameStatus.DRAFT)
+        .with_for_update()
+    )
+    return result.scalar_one_or_none()
+
+
 async def get_current(session: AsyncSession) -> list[Game]:
     """Текущие игры: draft (ждут старта) + active (уже идут)."""
     result = await session.execute(

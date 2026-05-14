@@ -204,20 +204,31 @@ class BankTransactionHandler:
         order_id = match.group(0)
 
         async with self._session_maker() as session:
-            order = await session.get(MBankOrder, order_id)
-            if order is None or order.status != MBankOrderStatus.PENDING:
+            # Атомарно: только один обработчик переведёт ордер из pending (гонки IMAP / дубликаты).
+            res = await session.execute(
+                update(MBankOrder)
+                .where(
+                    MBankOrder.id == order_id,
+                    MBankOrder.status == MBankOrderStatus.PENDING,
+                )
+                .values(
+                    status=MBankOrderStatus.MATCHED,
+                    bank_transaction_id=txn.id,
+                    actual_amount=txn.amount,
+                    updated_at=datetime.now(timezone.utc),
+                )
+            )
+            if getattr(res, "rowcount", 0) != 1:
+                await session.rollback()
                 return None
 
-            order.status = MBankOrderStatus.MATCHED
-            order.bank_transaction_id = txn.id
-            order.actual_amount = txn.amount
-            order.updated_at = datetime.now(timezone.utc)
-            await session.commit()
-            await session.refresh(order)
+            order = await session.get(MBankOrder, order_id)
+            if order is None:
+                await session.rollback()
+                return None
 
             logger.info("Order %s matched to transaction id=%d", order_id, txn.id)
 
-            # Зачисляем баланс юзеру + completed
             credited_user_id: int | None = None
             credited_amount = txn.amount or order.amount
             user_lang: str | None = None

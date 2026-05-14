@@ -11,6 +11,7 @@ from sqlalchemy import func, select, union_all
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models.kmb import KmbSession, KmbSettings
+from database.repositories import app_chats as app_chats_repo
 
 _SETTINGS_ID = 1
 
@@ -28,6 +29,10 @@ async def set_rules(session: AsyncSession, text: str | None) -> None:
     settings = await get_settings(session)
     settings.rules_text = text
     await session.flush()
+
+
+async def is_enabled(session: AsyncSession) -> bool:
+    return await app_chats_repo.any_kmb_enabled(session)
 
 
 async def create_session(

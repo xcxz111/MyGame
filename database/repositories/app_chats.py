@@ -92,8 +92,26 @@ async def set_checkers_enabled(
     return True
 
 
+async def set_kmb_enabled(
+    session: AsyncSession, chat_id: int, *, enabled: bool
+) -> bool:
+    chat = await get_by_chat_id(session, chat_id)
+    if chat is None:
+        return False
+    chat.kmb_enabled = 1 if enabled else 0
+    await session.flush()
+    return True
+
+
 async def any_checkers_enabled(session: AsyncSession) -> bool:
     result = await session.execute(
         select(AppChat.id).where(AppChat.checkers_enabled == 1).limit(1)
+    )
+    return result.scalar_one_or_none() is not None
+
+
+async def any_kmb_enabled(session: AsyncSession) -> bool:
+    result = await session.execute(
+        select(AppChat.id).where(AppChat.kmb_enabled == 1).limit(1)
     )
     return result.scalar_one_or_none() is not None
