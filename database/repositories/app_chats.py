@@ -79,3 +79,21 @@ async def set_game21_users_enabled(
     chat.game21_users_enabled = 1 if enabled else 0
     await session.flush()
     return True
+
+
+async def set_checkers_enabled(
+    session: AsyncSession, chat_id: int, *, enabled: bool
+) -> bool:
+    chat = await get_by_chat_id(session, chat_id)
+    if chat is None:
+        return False
+    chat.checkers_enabled = 1 if enabled else 0
+    await session.flush()
+    return True
+
+
+async def any_checkers_enabled(session: AsyncSession) -> bool:
+    result = await session.execute(
+        select(AppChat.id).where(AppChat.checkers_enabled == 1).limit(1)
+    )
+    return result.scalar_one_or_none() is not None

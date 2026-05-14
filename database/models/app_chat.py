@@ -41,6 +41,13 @@ class AppChat(Base):
         server_default="0",
         comment="PvP 21 между пользователями в этом чате",
     )
+    checkers_enabled: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False,
+        default=0,
+        server_default="0",
+        comment="PvP шашки в этом чате",
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()

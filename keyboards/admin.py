@@ -117,6 +117,24 @@ def admin_fees_keyboard(language_code: str) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_checkers_fee", lang),
+            callback_data="admin:fees:checkers",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_kmb_fee", lang),
+            callback_data="admin:fees:kmb",
+        )
+    )
+    builder.row(
+        InlineKeyboardButton(
+            text=t("admin_btn_referral_fee", lang),
+            callback_data="admin:fees:referral",
+        )
+    )
+    builder.row(
         InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings"),
         InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
     )

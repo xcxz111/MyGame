@@ -85,9 +85,22 @@ TEXTS: dict[str, dict[str, str]] = {
         ),
         "cabinet_title": "💼 Личный кабинет",
         "cabinet_balance": "💰 Баланс: <b>{balance} PLN</b>",
+        "cabinet_referral_link": "🔗 Ваша реферальная ссылка:\n<code>{link}</code>",
+        "btn_referral_program": "🤝 Реферальная программа",
+        "referral_program_text": (
+            "🤝 <b>Реферальная программа</b>\n\n"
+            "Ваша ссылка:\n<code>{link}</code>\n\n"
+            "Условия: приглашайте игроков по своей ссылке и получайте "
+            "<b>{percent}%</b> от реферальной базы, которую задаёт администратор.\n\n"
+            "<b>Ваши рефералы:</b>\n{referrals}"
+        ),
+        "referral_empty": "Пока нет рефералов.",
+        "referral_line": "• {name} — {profit} PLN",
         "btn_signup": "🎮 Записаться на игру 🎯🎳🎲",
         "main_menu_chat_fallback": "💬 Чат",
         "btn_play_21_bot": "♠️♥️Играть в 21♣️♦️",
+        "btn_checkers": "⚪️ Шашки ⚫️",
+        "btn_kmb": "👊✌️🤚 КМБ 👊✌️🤚",
         "btn_casino": "🎰 Слот 🎰",
         "slot_enter_bet_with_balance": "Ваш баланс: {balance} PLN\nВведите сумму ставки (например 1):",
         "slot_rules_block": "Правила и выплаты:\n• 3 одинаковых — x4\n• 2 одинаковых — x1.1\n• Все разные — проигрыш",
@@ -129,9 +142,46 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_games": "🎯 Игры",
         "admin_btn_21": "♠️ 21",
         "admin_btn_casino": "🎰 Слот",
-        "admin_btn_checkers": "🔴 Шашки",
+        "admin_btn_checkers": "⚪️ Шашки ⚫️",
+        "admin_checkers_title": (
+            "⚪️ Шашки ⚫️\n\n"
+            "комиссия: {commission}%\n\n"
+            "Всего игр в шашки: {total_games}\n"
+            "Прибыль с комиссии: {commission_sum} PLN"
+        ),
+        "admin_checkers_btn_enable": "Включить/Выключить",
+        "admin_checkers_enable_title": "⚪️ Шашки ⚫️\n\nВыберите чат для включения/выключения игры:",
+        "admin_checkers_chat_on": "Шашки в «{title}»: выкл",
+        "admin_checkers_chat_off": "Шашки в «{title}»: вкл",
+        "admin_checkers_btn_disable": "Выключить",
+        "admin_checkers_btn_rules": "Правила",
+        "admin_checkers_rules_title": "⚪️ Правила шашек ⚫️\n\n{rules}",
+        "admin_checkers_rules_prompt": "Введите правила шашек на русском языке. Бот сохранит их и переведёт для других языков.",
+        "admin_checkers_rules_empty": "Правила ещё не заданы.",
         "admin_btn_kmb": "🪖 КМБ",
+        "admin_kmb_title": (
+            "кнб\n\n"
+            "Комиссия: {commission}%\n\n"
+            "Уникальных пользователей: {unique_users}\n"
+            "Всего игр в КНБ: {total_games}\n"
+            "Прибыль с комиссии: {commission_sum} PLN"
+        ),
+        "admin_kmb_btn_rules": "Правила",
+        "admin_kmb_rules_title": "Правила КНБ\n\n{rules}",
+        "admin_kmb_rules_prompt": "Введите правила КНБ:",
+        "admin_kmb_rules_empty": "Правила ещё не заданы.",
+        "admin_kmb_rules_saved": "✅ Правила КНБ сохранены.",
         "admin_btn_stats": "📊 Статистика",
+        "admin_stats_title": "📊 <b>Статистика</b>",
+        "admin_stats_btn_users": "👥 Пользователи",
+        "admin_stats_users_title": (
+            "👥 <b>Пользователи</b>\n\n"
+            "Всего пользователей: {total}\n"
+            "Активных: {active}\n"
+            "Заблокированных: {banned}\n"
+            "С балансом: {with_balance}\n"
+            "Общий баланс: {balance_sum} PLN"
+        ),
         "admin_btn_bot_settings": "⚙️ Настройки бота",
         "admin_games_title": "🎯 <b>Игры</b>",
         "admin_btn_create_game": "➕ Создать игру",
@@ -143,6 +193,9 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_fees": "💸 Настройка комиссий",
         "admin_btn_withdraw_fee": "💸 Комиссия вывода",
         "admin_btn_slot_fee": "🎰 Комиссия Слота",
+        "admin_btn_checkers_fee": "⚪️ Комиссия Шашек ⚫️",
+        "admin_btn_kmb_fee": "👊✌️🤚 Комиссия КНБ",
+        "admin_btn_referral_fee": "🤝 Комиссия рефералов",
         "admin_fees_title": "💸 <b>Настройка комиссий</b>",
         "admin_pay_title": "<b>MBanks</b> — аккаунты:",
         "admin_pay_empty": "<b>MBanks</b>\nАккаунтов нет.",
@@ -153,6 +206,12 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_withdraw_fee_updated": "✅ Комиссия вывода обновлена: <b>{percent}%</b>",
         "admin_slot_fee_title": "🎰 <b>Комиссия Слота</b>\n\nТекущее значение: <b>{percent}%</b>\n\nВведите новый процент:",
         "admin_slot_fee_updated": "✅ Комиссия Слота обновлена: <b>{percent}%</b>",
+        "admin_checkers_fee_title": "⚪️ <b>Комиссия Шашек</b> ⚫️\n\nТекущее значение: <b>{percent}%</b>\n\nВведите новый процент:",
+        "admin_checkers_fee_updated": "✅ Комиссия Шашек обновлена: <b>{percent}%</b>",
+        "admin_kmb_fee_title": "👊✌️🤚 <b>Комиссия КНБ</b>\n\nТекущее значение: <b>{percent}%</b>\n\nВведите новый процент:",
+        "admin_kmb_fee_updated": "✅ Комиссия КНБ обновлена: <b>{percent}%</b>",
+        "admin_referral_fee_title": "🤝 <b>Комиссия рефералов</b>\n\nТекущее значение: <b>{percent}%</b>\n\nВведите новый процент:",
+        "admin_referral_fee_updated": "✅ Комиссия рефералов обновлена: <b>{percent}%</b>",
         "admin_btn_game21_fees": "♠️ 21 — комиссии",
         "admin_fees_21_title": (
             "♠️ <b>Комиссии игры 21</b>\n\n"
@@ -181,7 +240,7 @@ TEXTS: dict[str, dict[str, str]] = {
             "Ничьи: {bot_draw_count}\n\n"
             "Прибыль БОТа: {bot_profit_sum} PLN\n\n"
             "-------------------------------------------\n"
-            "Мжду пользователями:\n\n"
+            "Между пользователями:\n\n"
             "Комиссия: {users_fee}%\n\n"
             "Всего PvP игр: {pvp_total}\n"
             "Прибыль с комиссии: {pvp_commission_sum} PLN\n\n"
@@ -207,7 +266,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_21_btn_users_off": "PvP глобально: включить",
         "admin_21_chat_pvp_on": "PvP в «{title}»: выкл",
         "admin_21_chat_pvp_off": "PvP в «{title}»: вкл",
-        "game21_active_notice": "У вас уже есть активная игра в 21. Сначала завершите её.",
+        "game21_active_notice": "У вас уже есть активная игра. Сначала завершите её.",
         "game21_bot_midgame_menu_blocked": (
             "Вы сейчас находитесь в активной игре. Сначала завершите текущую игру."
         ),
@@ -321,6 +380,107 @@ TEXTS: dict[str, dict[str, str]] = {
         "game21_pvp_player_can_stop": "{name}, результат: {total}. Можно «Хватит» или ещё бросок.",
         "game21_pvp_stop_announce": "Игрок {name} сказал «Хватит».\nЕго результат: {total}",
         "game21_pvp_not_your_turn_stop": "Сейчас ход игрока {name}",
+        "checkers_choose_chat": "Выберите чат для игры в шашки:",
+        "checkers_choose_topic": "Выберите игровую комнату (🟢 свободна, 🔴 занята):",
+        "checkers_enter_bet": "<b>{chat}</b>\nВаш баланс: {balance} PLN\nВведите сумму ставки:",
+        "checkers_confirm": "Ставка: {amount} PLN\nСумма выигрыша: {win} PLN\nНачать поиск соперника?",
+        "checkers_search_post": "{user} ищет соперника в шашки.\nСтавка: {amount} PLN\nСумма выигрыша: {win} PLN",
+        "checkers_match_title": "Игра в шашки",
+        "checkers_match_started_in_topic": "Игра в шашки началась в {room}",
+        "checkers_match_prize": "Сумма выигрыша: {win} PLN",
+        "checkers_match_rules_heading": "Правила игры:",
+        "checkers_rules_body": (
+            "Белые ходят первыми. Шашки ходят по диагонали, обязательное взятие нужно выполнять. "
+            "Дамка ходит по диагонали на любое расстояние. Если игрок не делает ход 2 минуты, он проигрывает."
+        ),
+        "checkers_btn_accept": "Принять игру",
+        "checkers_search_started": "Поиск игры в шашки начат. Ставка {amount} PLN списана.",
+        "checkers_search_cancelled_refund": "Отменено.\nСумма ставки возвращена на баланс.",
+        "checkers_search_timeout": "Игру в шашки никто не принял. Ставка {amount} PLN возвращена на баланс.",
+        "checkers_active_notice": "У вас уже есть активная игра или поиск игры.",
+        "checkers_disabled": "Игра в шашки временно выключена.",
+        "checkers_board_text": (
+            "⚪️ <b>Шашки</b> ⚫️\n"
+            "⚪ {white}\n"
+            "⚫ {black}\n\n"
+            "Банк: {amount} PLN\n"
+            "Ходит: {turn}"
+        ),
+        "checkers_not_your_turn": "Сейчас не ваш ход.",
+        "checkers_bad_move": "Так ходить нельзя.",
+        "checkers_flood_wait": "Слишком быстро. Подождите {seconds} сек.",
+        "checkers_decide_white": "{players} — бросьте кубик 🎲 по одному разу. Кто выбросит больше, играет белыми.",
+        "checkers_white_chosen": "{name} играет белыми. Игра начинается.",
+        "checkers_turn_timeout_warning": "{name}, у вас осталась 1 минута, чтобы сделать ход, иначе вы проиграете.",
+        "checkers_turn_timeout_result": (
+            "Время на ход вышло.\n"
+            "{loser} проиграл.\n\n"
+            "Победитель: {winner}\n"
+            "Выигрыш {payout} PLN добавлен на баланс."
+        ),
+        "checkers_draw_countdown": (
+            "В игре уже {no_capture} ходов не была сбита ни одна шашка.\n"
+            "Если в течение 10 ходов (по 5 на каждого) не будет сбита ни одна шашка, будет объявлена ничья.\n\n"
+            "До ничьей осталось ходов: {remaining}"
+        ),
+        "checkers_draw_countdown_reset": "Шашка была сбита. Отсчёт до ничьей сброшен.",
+        "checkers_draw_result": "Игра окончена.\nНичья.\n\nСтавка {amount} PLN возвращена обоим игрокам.",
+        "checkers_winner": "Игра окончена.\nПобедитель: {name}\n\nВыигрыш {payout} PLN добавлен на баланс.",
+        "kmb_choose_chat": "Выберите чат для игры в КМБ:",
+        "kmb_choose_topic": "Выберите игровую комнату (🟢 свободна, 🔴 занята):",
+        "kmb_enter_wins": "<b>{chat}</b>\nДо скольких побед играем?\nВведите число от 1 до 10:",
+        "kmb_wins_invalid": "Неверное количество побед. Введите число от 1 до 10.",
+        "kmb_enter_bet": "<b>{chat}</b>\nВаш баланс: {balance} PLN\nВведите сумму ставки:",
+        "kmb_confirm": "Игра до {wins} побед\nСтавка: {amount} PLN\nСумма выигрыша: {win} PLN\nНачать поиск соперника?",
+        "kmb_search_post": "{user} ищет соперника в КМБ.\nИгра до {wins} побед\nСтавка: {amount} PLN\nСумма выигрыша: {win} PLN",
+        "kmb_btn_accept": "Принять игру",
+        "kmb_search_started": "Поиск игры в КМБ начат. Игра до {wins} побед. Ставка {amount} PLN списана.",
+        "kmb_search_cancelled_refund": "Отменено.\nСумма ставки возвращена на баланс.",
+        "kmb_search_timeout": "Игру в КМБ никто не принял. Ставка {amount} PLN возвращена на баланс.",
+        "kmb_match_started_in_topic": "Игра в Камень/Ножницы/Бумага началась в {room}",
+        "kmb_match_title": "Игра в Камень/Ножницы/Бумага",
+        "kmb_match_prize": "Сумма выигрыша: {win} PLN",
+        "kmb_match_rules_heading": "Правила игры:",
+        "kmb_rules_body": (
+            "Камень бьёт ножницы, ножницы режут бумагу, бумага накрывает камень. "
+            "При одинаковом выборе раунд считается ничьей и переигрывается."
+        ),
+        "kmb_pick_prompt": (
+            "👊✌️🤚 <b>КМБ</b>\n\n"
+            "Игра до {wins} побед\n"
+            "Счёт: {p1_score} - {p2_score}\n\n"
+            "{p1}: {p1_status}\n"
+            "{p2}: {p2_status}\n\n"
+            "Выберите: камень, ножницы или бумага."
+        ),
+        "kmb_pick_wait": "ожидает выбор",
+        "kmb_pick_done": "выбор сделан",
+        "kmb_not_your_game": "Это не ваша игра.",
+        "kmb_choice_saved": "Выбор принят.",
+        "kmb_round_win": (
+            "Раунд окончен.\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Раунд выиграл: {winner}\n"
+            "Счёт: {p1_score} - {p2_score}\n\n"
+            "Игра до {wins} побед. Выберите ещё раз."
+        ),
+        "kmb_result_win": (
+            "Игра окончена.\n"
+            "Финальный счёт: {p1_score} - {p2_score}\n\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Победитель: {winner}\n"
+            "Выигрыш {payout} PLN добавлен на баланс."
+        ),
+        "kmb_result_draw": (
+            "Ничья.\n"
+            "{p1}: {p1_choice}\n"
+            "{p2}: {p2_choice}\n\n"
+            "Счёт: {p1_score} - {p2_score}\n"
+            "Игра до {wins} побед.\n\n"
+            "Выберите ещё раз."
+        ),
         "game21_pvp_stop_only_on_equal": "«Хватит» доступно только при равном счёте.",
         "game21_pvp_winner": (
             "Игра окончена.\n"
@@ -656,9 +816,19 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_games": "🎯 Games",
         "admin_btn_21": "♠️ 21",
         "admin_btn_casino": "🎰 Slot",
-        "admin_btn_checkers": "🔴 Checkers",
+        "admin_btn_checkers": "⚪️ Checkers ⚫️",
         "admin_btn_kmb": "🪖 KMB",
         "admin_btn_stats": "📊 Statistics",
+        "admin_stats_title": "📊 <b>Statistics</b>",
+        "admin_stats_btn_users": "👥 Users",
+        "admin_stats_users_title": (
+            "👥 <b>Users</b>\n\n"
+            "Total users: {total}\n"
+            "Active: {active}\n"
+            "Banned: {banned}\n"
+            "With balance: {with_balance}\n"
+            "Total balance: {balance_sum} PLN"
+        ),
         "admin_btn_bot_settings": "⚙️ Bot settings",
         "admin_games_title": "🎯 <b>Games</b>",
         "admin_btn_create_game": "➕ Create game",
@@ -707,7 +877,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_21_btn_users_off": "PvP global: turn on",
         "admin_21_chat_pvp_on": "PvP in «{title}»: off",
         "admin_21_chat_pvp_off": "PvP in «{title}»: on",
-        "game21_active_notice": "You already have an active 21 game.",
+        "game21_active_notice": "You already have an active game. Finish it first.",
         "game21_bot_midgame_menu_blocked": (
             "You are currently in an active game. First finish the current game."
         ),
@@ -1136,9 +1306,19 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_games": "🎯 Ігри",
         "admin_btn_21": "♠️ 21",
         "admin_btn_casino": "🎰 Слот",
-        "admin_btn_checkers": "🔴 Шашки",
+        "admin_btn_checkers": "⚪️ Шашки ⚫️",
         "admin_btn_kmb": "🪖 КМБ",
         "admin_btn_stats": "📊 Статистика",
+        "admin_stats_title": "📊 <b>Статистика</b>",
+        "admin_stats_btn_users": "👥 Пользователи",
+        "admin_stats_users_title": (
+            "👥 <b>Пользователи</b>\n\n"
+            "Всего пользователей: {total}\n"
+            "Активных: {active}\n"
+            "Заблокированных: {banned}\n"
+            "С балансом: {with_balance}\n"
+            "Общий баланс: {balance_sum} PLN"
+        ),
         "admin_btn_bot_settings": "⚙️ Налаштування бота",
         "admin_games_title": "🎯 <b>Ігри</b>",
         "admin_btn_create_game": "➕ Створити гру",
@@ -1187,7 +1367,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_21_btn_users_off": "PvP global: turn on",
         "admin_21_chat_pvp_on": "PvP in «{title}»: off",
         "admin_21_chat_pvp_off": "PvP in «{title}»: on",
-        "game21_active_notice": "You already have an active 21 game.",
+        "game21_active_notice": "У вас вже є активна гра. Спочатку завершіть її.",
         "game21_bot_midgame_menu_blocked": (
             "Ви зараз у активній грі. Спочатку завершіть поточну гру."
         ),
@@ -1616,9 +1796,19 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_btn_games": "🎯 Gry",
         "admin_btn_21": "♠️ 21",
         "admin_btn_casino": "🎰 Slot",
-        "admin_btn_checkers": "🔴 Warcaby",
+        "admin_btn_checkers": "⚪️ Warcaby ⚫️",
         "admin_btn_kmb": "🪖 KMB",
         "admin_btn_stats": "📊 Statystyka",
+        "admin_stats_title": "📊 <b>Statystyka</b>",
+        "admin_stats_btn_users": "👥 Użytkownicy",
+        "admin_stats_users_title": (
+            "👥 <b>Użytkownicy</b>\n\n"
+            "Łącznie użytkowników: {total}\n"
+            "Aktywnych: {active}\n"
+            "Zablokowanych: {banned}\n"
+            "Z saldem: {with_balance}\n"
+            "Łączne saldo: {balance_sum} PLN"
+        ),
         "admin_btn_bot_settings": "⚙️ Ustawienia bota",
         "admin_games_title": "🎯 <b>Gry</b>",
         "admin_btn_create_game": "➕ Utwórz grę",
@@ -1667,7 +1857,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_21_btn_users_off": "PvP global: turn on",
         "admin_21_chat_pvp_on": "PvP in «{title}»: off",
         "admin_21_chat_pvp_off": "PvP in «{title}»: on",
-        "game21_active_notice": "You already have an active 21 game.",
+        "game21_active_notice": "Masz już aktywną grę. Najpierw ją zakończ.",
         "game21_bot_midgame_menu_blocked": (
             "Jesteś w trakcie aktywnej gry. Najpierw dokończ bieżącą grę."
         ),

@@ -1,5 +1,6 @@
 from database.repositories import (
     app_chats,
+    checkers,
     fees,
     game_participants,
     games,
@@ -19,6 +20,7 @@ __all__ = [
     "withdrawals",
     "payment_logs",
     "app_chats",
+    "checkers",
     "games",
     "prizes",
     "slot",

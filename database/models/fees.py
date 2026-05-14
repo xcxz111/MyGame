@@ -1,8 +1,4 @@
-"""Глобальные настройки комиссий (singleton, id=1).
-
-Сейчас одно поле — комиссия вывода. В будущем сюда добавим комиссии для
-переводов между юзерами, игр и т.п.
-"""
+"""Глобальные настройки комиссий (singleton, id=1)."""
 
 from datetime import datetime
 from decimal import Decimal
@@ -30,10 +26,26 @@ class Fee(Base):
         server_default="0.00",
         comment="Комиссия игры Слот, в процентах от выплаты",
     )
+    kmb_percent: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2),
+        default=Decimal("0.00"),
+        server_default="0.00",
+        comment="Комиссия игры КМБ, в процентах от выплаты",
+    )
+    referral_percent: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2),
+        default=Decimal("0.00"),
+        server_default="0.00",
+        comment="Процент реферального начисления",
+    )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
     )
 
     def __repr__(self) -> str:
-        return f"<Fee id={self.id} withdraw_percent={self.withdraw_percent} slot_percent={self.slot_percent}>"
+        return (
+            f"<Fee id={self.id} withdraw_percent={self.withdraw_percent} "
+            f"slot_percent={self.slot_percent} kmb_percent={self.kmb_percent} "
+            f"referral_percent={self.referral_percent}>"
+        )

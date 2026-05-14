@@ -16,10 +16,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.models import User
 from database.repositories import fees as fees_repo
 from database.repositories import slot as slot_repo
+from database.repositories import users as users_repo
 from locales.texts import get_lang, t
 from permissions import is_admin
-from services.game21.active import user_in_any_game21
 from services.game21.balance import add_balance, get_balance, take_balance
+from services.games.busy import user_in_any_interactive_game
 from services.slot import decode_line, fmt_money, fmt_multiplier, multiplier_for, payout_for
 from settings import get_settings
 from states.slot import SlotAdminRulesState, SlotState
@@ -116,8 +117,8 @@ async def on_slot_menu(
     callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext
 ) -> None:
     lang = _lang(user, callback)
-    if user_in_any_game21(user.user_id):
-        await callback.answer(t("game21_active_notice", lang), show_alert=True)
+    if user_in_any_interactive_game(user.user_id):
+        await callback.answer(t("checkers_active_notice", lang), show_alert=True)
         return
     if not await slot_repo.is_enabled(session):
         await callback.answer(t("slot_disabled", lang), show_alert=True)
@@ -205,6 +206,13 @@ async def on_slot_spin(
             multiplier=multiplier,
             commission_percent=commission,
             payout=payout,
+        )
+        bot_profit = (bet - payout).quantize(Decimal("0.01"))
+        await users_repo.award_referral_percent(
+            session,
+            referral_id=uid,
+            base_amount=bot_profit,
+            source="game:slot",
         )
         await session.commit()
         await state.set_state(SlotState.waiting_spin)

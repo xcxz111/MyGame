@@ -2,8 +2,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from locales.texts import t
-from services.game21.active import slot_has_live_or_search
 from services.games.forum_thread import format_forum_topic_display_label
+from services.games.busy import slot_busy_for_new_game
 
 
 def play21_menu_keyboard(lang: str, *, bot_on: bool, pvp_on: bool) -> InlineKeyboardMarkup:
@@ -111,7 +111,7 @@ def play21_pvp_topic_pick_keyboard(
     emoji_busy = t("game21_pvp_topic_busy", lang)
     general_label = t("game21_pvp_topic_general", lang)
     if include_general:
-        busy_g = slot_has_live_or_search(chat_id, None)
+        busy_g = slot_busy_for_new_game(chat_id, None)
         em = emoji_busy if busy_g else emoji_free
         builder.row(
             InlineKeyboardButton(
@@ -120,7 +120,7 @@ def play21_pvp_topic_pick_keyboard(
             )
         )
     for tid, name in topics:
-        busy = slot_has_live_or_search(chat_id, tid)
+        busy = slot_busy_for_new_game(chat_id, tid)
         em = emoji_busy if busy else emoji_free
         label = format_forum_topic_display_label(lang, message_thread_id=tid, name=name)
         builder.row(

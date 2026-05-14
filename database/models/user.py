@@ -69,6 +69,12 @@ class User(Base):
         nullable=True,
         default=None,
     )
+    referrer_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        nullable=True,
+        default=None,
+        comment="Telegram user_id пригласившего пользователя",
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,

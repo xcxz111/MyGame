@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_session_maker
 from database.models import User
 from database.repositories import app_chats as app_chats_repo
+from database.repositories import checkers as checkers_repo
 from database.repositories import app_chat_allowed_topics as allowed_topics_repo
 from database.repositories import forum_topics as forum_topics_repo
 from database.repositories import game21_settings as g21_repo
@@ -46,7 +47,7 @@ from services.games.forum_thread import (
     thread_kw,
 )
 from services.game21 import bot_flow
-from services.game21.active import pvp_busy_chat_id_for_user, user_in_any_game21
+from services.game21.active import user_in_any_game21
 from services.game21.balance import METHOD_PVP_REFUND, METHOD_PVP_STAKE, add_balance, take_balance
 from services.game21.formatting import fmt_money, name_link, possible_win_pvp
 from services.game21.pvp_post import post_dual_search, unpin_general_message
@@ -59,7 +60,6 @@ from services.game21.pvp_runtime import (
 from services.game21.pvp_state import (
     get_live,
     get_search,
-    is_slot_busy,
     lock_for_chat,
     pop_search,
     slot_key,
@@ -68,7 +68,12 @@ from services.game21.pvp_state import (
     user_game21_lock,
 )
 from services.game21.pvp_search import arm_search_timeout, cancel_owner_pvp_search_now
-from services.games.state import resolve_active_game_id
+from services.games.busy import (
+    active_interactive_chat_id_for_user,
+    slot_busy_for_new_game,
+    slot_busy_outside_game21,
+    user_in_any_interactive_game,
+)
 from settings import get_settings
 from states.game21 import Play21BotState, Play21PvpState
 
@@ -289,6 +294,8 @@ async def _present_pvp_after_chat_selected(
                 reply_markup=play21_rules_back_keyboard(lang),
             )
         return "restricted_empty"
+    if slot_busy_for_new_game(cid, None):
+        return "busy"
     await state.update_data(pvp_chat_id=cid, pvp_chat_title=title, pvp_thread_id=None)
     await state.set_state(Play21PvpState.waiting_bet)
     bal = user.balance if user.balance is not None else Decimal("0")
@@ -311,7 +318,7 @@ def _game_notice(lang: str) -> str:
 async def _busy_play21_screen_html(
     bot: Bot, session: AsyncSession, lang: str, user_id: int
 ) -> str:
-    cid = pvp_busy_chat_id_for_user(user_id)
+    cid = active_interactive_chat_id_for_user(user_id)
     if cid:
         row = await app_chats_repo.get_by_chat_id(session, cid)
         stored = str(row.chat_link).strip() if row and row.chat_link else None
@@ -413,7 +420,7 @@ async def on_play21_menu(
     state: FSMContext,
 ) -> None:
     lang = _lang(user, callback)
-    if user_in_any_game21(user.user_id):
+    if user_in_any_interactive_game(user.user_id):
         await _show_play21_busy(callback, session, callback.bot, lang, user.user_id)
         return
     s = await g21_repo.get_settings(session)
@@ -472,7 +479,7 @@ async def on_play21_bot(
     if not s.enabled_bot:
         await callback.answer(t("game21_coming_soon_play", lang), show_alert=True)
         return
-    if user_in_any_game21(user.user_id):
+    if user_in_any_interactive_game(user.user_id):
         await _show_play21_busy(callback, session, callback.bot, lang, user.user_id)
         return
     await state.set_state(Play21BotState.waiting_bet)
@@ -534,6 +541,10 @@ async def on_play21_bot_confirm_yes(
     data = await state.get_data()
     bet = Decimal(str(data.get("bet") or "0"))
     c = Decimal(str(data.get("commission") or "0"))
+    if user_in_any_interactive_game(user.user_id):
+        await _show_play21_busy(callback, session, bot, lang, user.user_id)
+        await state.clear()
+        return
     sm = get_session_maker()
     ok, err = await bot_flow.charge_and_start(bot, sm, user.user_id, bet, c, lang)
     if not ok:
@@ -559,6 +570,7 @@ async def on_play21_bot_confirm_no(
     await state.clear()
     menu_chats = await app_chats_repo.list_for_main_menu(session)
     show_game21 = await g21_repo.any_game21_enabled(session)
+    show_checkers = await checkers_repo.is_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await _edit_text_skip_not_modified(
         callback.message,
@@ -569,6 +581,7 @@ async def on_play21_bot_confirm_no(
             get_settings().admin_id,
             menu_chats=menu_chats,
             show_game21=show_game21,
+            show_checkers=show_checkers,
             show_slot=show_slot,
         ),
     )
@@ -589,7 +602,7 @@ async def on_play21_pvp_entry(
     callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext, bot: Bot
 ) -> None:
     lang = _lang(user, callback)
-    if user_in_any_game21(user.user_id):
+    if user_in_any_interactive_game(user.user_id):
         await _show_play21_busy(callback, session, callback.bot, lang, user.user_id)
         return
     opts = await _collect_pvp_chats(bot, session, user.user_id)
@@ -620,6 +633,9 @@ async def on_play21_pvp_entry(
     if res == "bad_chat":
         await callback.answer(t("game21_pvp_no_available_chat", lang), show_alert=True)
         return
+    if res == "busy":
+        await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
+        return
     await callback.answer()
 
 
@@ -630,7 +646,7 @@ async def on_play21_pvp_chat(
     callback: CallbackQuery, session: AsyncSession, user: User, state: FSMContext, bot: Bot
 ) -> None:
     lang = _lang(user, callback)
-    if user_in_any_game21(user.user_id):
+    if user_in_any_interactive_game(user.user_id):
         await _show_play21_busy(callback, session, callback.bot, lang, user.user_id)
         return
     try:
@@ -649,6 +665,9 @@ async def on_play21_pvp_chat(
     )
     if res == "bad_chat":
         await callback.answer(t("game21_pvp_no_available_chat", lang), show_alert=True)
+        return
+    if res == "busy":
+        await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
         return
     await callback.answer()
 
@@ -674,7 +693,7 @@ async def on_play21_pvp_topic(
     if not await allowed_topics_repo.is_allowed_public(session, cid, thread_id):
         await callback.answer(t("game21_pvp_topic_forbidden", lang), show_alert=True)
         return
-    if is_slot_busy(cid, thread_id):
+    if slot_busy_for_new_game(cid, thread_id):
         await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
         return
     try:
@@ -798,17 +817,17 @@ async def on_pvp_confirm_yes(
         )
         await callback.answer()
         return
-    if resolve_active_game_id(game_chat_id, thread_id):
+    if slot_busy_for_new_game(game_chat_id, thread_id):
         await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
         return
     sk = slot_key(game_chat_id, thread_id)
     lock = lock_for_chat(game_chat_id, thread_id)
     async with user_game21_lock(user.user_id):
         async with lock:
-            if get_live(sk):
+            if slot_busy_for_new_game(game_chat_id, thread_id):
                 await callback.answer(t("game21_pvp_active_exists", lang), show_alert=True)
                 return
-            if user_in_any_game21(user.user_id):
+            if user_in_any_interactive_game(user.user_id):
                 await callback.answer(t("game21_active_notice", lang), show_alert=True)
                 return
             ok = await take_balance(session, user.user_id, bet, method=METHOD_PVP_STAKE)
@@ -903,7 +922,7 @@ async def on_pvp_accept(
     if callback.from_user.id == owner_id:
         await callback.answer(t("game21_pvp_self_accept_forbidden", lang), show_alert=True)
         return
-    if user_in_any_game21(callback.from_user.id):
+    if user_in_any_interactive_game(callback.from_user.id):
         await callback.answer(_game_notice(lang), show_alert=True)
         return
     req = get_search(owner_id)
@@ -924,10 +943,10 @@ async def on_pvp_accept(
             if not req:
                 await callback.answer(t("game21_cancelled", lang), show_alert=True)
                 return
-            if get_live(sk):
+            if get_live(sk) or slot_busy_outside_game21(game_chat_id, thread_id):
                 await callback.answer(t("game21_pvp_active_exists", lang), show_alert=True)
                 return
-            if user_in_any_game21(callback.from_user.id):
+            if user_in_any_interactive_game(callback.from_user.id):
                 await callback.answer(_game_notice(lang), show_alert=True)
                 return
             ok = await take_balance(session, callback.from_user.id, bet, method=METHOD_PVP_STAKE)

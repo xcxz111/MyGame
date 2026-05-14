@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
 from database.repositories import app_chats as app_chats_repo
+from database.repositories import checkers as checkers_repo
 from database.repositories import game21_settings as g21_repo
 from database.repositories import slot as slot_repo
 from keyboards import language_keyboard, main_menu_keyboard
@@ -45,6 +46,7 @@ async def on_menu_main(
     lang = _user_lang(user, callback)
     menu_chats = await app_chats_repo.list_for_main_menu(session)
     show_game21 = await g21_repo.any_game21_enabled(session)
+    show_checkers = await checkers_repo.is_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     try:
         await callback.message.delete()
@@ -59,6 +61,7 @@ async def on_menu_main(
             settings.admin_id,
             menu_chats=menu_chats,
             show_game21=show_game21,
+            show_checkers=show_checkers,
             show_slot=show_slot,
         ),
     )

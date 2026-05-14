@@ -14,6 +14,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from database.repositories import game21_history as g21_hist
+from database.repositories import users as users_repo
 from locales.texts import t
 from services.game21.balance import (
     METHOD_PVP_REFUND,
@@ -233,6 +234,17 @@ async def _finish_pvp_game_locked(
                 await add_balance(session, p2, bet, method=METHOD_PVP_REFUND)
             elif winner_id in (p1, p2):
                 await add_balance(session, int(winner_id), payout, method=METHOD_PVP_WIN)
+            player_commission_base = (commission_amount / Decimal("2")).quantize(
+                Decimal("0.01")
+            )
+            if player_commission_base > 0:
+                for uid in (p1, p2):
+                    await users_repo.award_referral_percent(
+                        session,
+                        referral_id=uid,
+                        base_amount=player_commission_base,
+                        source="game:21:pvp",
+                    )
             pvp_tok_raw = st.get("pvp_session_token")
             pvp_tok = int(pvp_tok_raw) if pvp_tok_raw is not None else None
             await g21_hist.upsert_users_session_gb(

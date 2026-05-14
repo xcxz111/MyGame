@@ -3,9 +3,16 @@
 Подключим к хендлерам на следующем шаге.
 """
 
+from decimal import Decimal
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.models.payment_log import PaymentLogMethod
+from database.models.referral import ReferralReward
 from database.models.user import User, UserRole, UserStatus
+from database.repositories import fees as fees_repo
+from database.repositories import payment_logs as payment_logs_repo
 
 
 async def get_user(session: AsyncSession, user_id: int) -> User | None:
@@ -62,3 +69,101 @@ async def set_role(session: AsyncSession, user_id: int, role: str) -> None:
     if user is not None:
         user.role = role
         await session.flush()
+
+
+async def set_referrer_if_empty(
+    session: AsyncSession, user_id: int, referrer_id: int
+) -> bool:
+    if int(user_id) == int(referrer_id):
+        return False
+    user = await session.get(User, user_id)
+    referrer = await session.get(User, referrer_id)
+    if user is None or referrer is None or user.referrer_id is not None:
+        return False
+    user.referrer_id = int(referrer_id)
+    await session.flush()
+    return True
+
+
+async def list_referrals_with_profit(
+    session: AsyncSession, referrer_id: int
+) -> list[tuple[User, Decimal]]:
+    profit_sq = (
+        select(
+            ReferralReward.referral_id,
+            func.coalesce(func.sum(ReferralReward.amount), 0).label("profit"),
+        )
+        .where(ReferralReward.referrer_id == int(referrer_id))
+        .group_by(ReferralReward.referral_id)
+        .subquery()
+    )
+    result = await session.execute(
+        select(
+            User,
+            func.coalesce(profit_sq.c.profit, 0).label("profit"),
+        )
+        .outerjoin(
+            profit_sq,
+            profit_sq.c.referral_id == User.user_id,
+        )
+        .where(User.referrer_id == int(referrer_id))
+        .order_by(User.created_at.desc())
+    )
+    return [(row[0], Decimal(str(row.profit or "0"))) for row in result.all()]
+
+
+async def add_referral_reward(
+    session: AsyncSession,
+    *,
+    referral_id: int,
+    amount: Decimal,
+    source: str | None = None,
+) -> bool:
+    referral = await session.get(User, int(referral_id))
+    if referral is None or referral.referrer_id is None or amount <= 0:
+        return False
+    referrer = await session.get(User, int(referral.referrer_id))
+    if referrer is None:
+        return False
+    referrer.balance = (referrer.balance or Decimal("0")) + amount
+    session.add(
+        ReferralReward(
+            referrer_id=int(referrer.user_id),
+            referral_id=int(referral.user_id),
+            amount=amount,
+            source=source,
+        )
+    )
+    await session.flush()
+    await payment_logs_repo.log(
+        session,
+        user_id=int(referrer.user_id),
+        method=PaymentLogMethod.REFERRAL,
+        amount=amount,
+        balance_after=referrer.balance,
+    )
+    return True
+
+
+async def award_referral_percent(
+    session: AsyncSession,
+    *,
+    referral_id: int,
+    base_amount: Decimal,
+    source: str | None = None,
+) -> Decimal:
+    if base_amount <= 0:
+        return Decimal("0.00")
+    percent = await fees_repo.get_referral_percent(session)
+    if percent <= 0:
+        return Decimal("0.00")
+    amount = (base_amount * percent / Decimal("100")).quantize(Decimal("0.01"))
+    if amount <= 0:
+        return Decimal("0.00")
+    ok = await add_referral_reward(
+        session,
+        referral_id=referral_id,
+        amount=amount,
+        source=source,
+    )
+    return amount if ok else Decimal("0.00")

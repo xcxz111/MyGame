@@ -1,0 +1,1 @@
+"""КМБ service package."""

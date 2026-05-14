@@ -16,3 +16,15 @@ class WithdrawFeeState(StatesGroup):
 
 class SlotFeeState(StatesGroup):
     waiting_percent = State()
+
+
+class CheckersFeeState(StatesGroup):
+    waiting_percent = State()
+
+
+class KmbFeeState(StatesGroup):
+    waiting_percent = State()
+
+
+class ReferralFeeState(StatesGroup):
+    waiting_percent = State()

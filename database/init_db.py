@@ -18,6 +18,8 @@ from database.engine import get_engine
 from database.models import (  # noqa: F401  — регистрирует модели в metadata
     AppChat,
     AppChatAllowedTopic,
+    CheckersSession,
+    CheckersSettings,
     Fee,
     ForumTopic,
     Game,
@@ -27,12 +29,15 @@ from database.models import (  # noqa: F401  — регистрирует мод
     Game21UsersRound,
     Game21UsersSession,
     GameParticipant,
+    KmbSession,
+    KmbSettings,
     MBankAccount,
     MBankOrder,
     MBankRawEmail,
     MBankTransaction,
     PaymentLog,
     Prize,
+    ReferralReward,
     SlotSettings,
     SlotSpin,
     Throw,
@@ -108,7 +113,7 @@ def _ensure_app_chats_button_titles(connection) -> None:
             cols.add(col)
 
 
-def _ensure_fees_slot_percent(connection) -> None:
+def _ensure_fees_columns(connection) -> None:
     insp = inspect(connection)
     if "fees" not in insp.get_table_names():
         return
@@ -118,6 +123,72 @@ def _ensure_fees_slot_percent(connection) -> None:
             text(
                 "ALTER TABLE `fees` ADD COLUMN `slot_percent` DECIMAL(5,2) NOT NULL "
                 "DEFAULT 0.00 COMMENT 'Комиссия игры Слот, в процентах от выплаты'"
+            )
+        )
+    if "kmb_percent" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `fees` ADD COLUMN `kmb_percent` DECIMAL(5,2) NOT NULL "
+                "DEFAULT 0.00 COMMENT 'Комиссия игры КМБ, в процентах от выплаты'"
+            )
+        )
+    if "referral_percent" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `fees` ADD COLUMN `referral_percent` DECIMAL(5,2) NOT NULL "
+                "DEFAULT 0.00 COMMENT 'Процент реферального начисления'"
+            )
+        )
+
+
+def _ensure_users_referrer_id(connection) -> None:
+    insp = inspect(connection)
+    if "users" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("users")}
+    if "referrer_id" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `users` ADD COLUMN `referrer_id` BIGINT NULL "
+                "COMMENT 'Telegram user_id пригласившего пользователя'"
+            )
+        )
+
+
+def _ensure_checkers_columns(connection) -> None:
+    insp = inspect(connection)
+    tables = set(insp.get_table_names())
+    if "checkers_sessions" in tables:
+        cols = {c["name"] for c in insp.get_columns("checkers_sessions")}
+        for col, ddl in (
+            ("commission_percent", "DECIMAL(5,2) NOT NULL DEFAULT 0.00"),
+            ("commission_amount", "DECIMAL(10,2) NOT NULL DEFAULT 0.00"),
+        ):
+            if col not in cols:
+                connection.execute(text(f"ALTER TABLE `checkers_sessions` ADD COLUMN `{col}` {ddl}"))
+    if "checkers_settings" in tables:
+        cols = {c["name"] for c in insp.get_columns("checkers_settings")}
+        for col, ddl in (
+            ("enabled", "SMALLINT NOT NULL DEFAULT 1"),
+            ("commission_percent", "DECIMAL(5,2) NOT NULL DEFAULT 0.00"),
+            ("rules_text_en", "MEDIUMTEXT NULL"),
+            ("rules_text_uk", "MEDIUMTEXT NULL"),
+            ("rules_text_pl", "MEDIUMTEXT NULL"),
+        ):
+            if col not in cols:
+                connection.execute(text(f"ALTER TABLE `checkers_settings` ADD COLUMN `{col}` {ddl}"))
+
+
+def _ensure_kmb_columns(connection) -> None:
+    insp = inspect(connection)
+    if "kmb_sessions" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("kmb_sessions")}
+    if "target_wins" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `kmb_sessions` ADD COLUMN `target_wins` INT NOT NULL "
+                "DEFAULT 1 COMMENT 'Игра до N побед'"
             )
         )
 
@@ -164,15 +235,33 @@ def _ensure_app_chats_game21_users(connection) -> None:
         )
 
 
+def _ensure_app_chats_checkers_enabled(connection) -> None:
+    insp = inspect(connection)
+    if "app_chats" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("app_chats")}
+    if "checkers_enabled" not in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `app_chats` ADD COLUMN `checkers_enabled` SMALLINT NOT NULL "
+                "DEFAULT 0 COMMENT 'PvP шашки в чате'"
+            )
+        )
+
+
 async def init_db() -> None:
     """Создаёт таблицы по моделям. Движок не закрывает — он переиспользуется ботом."""
     engine = get_engine()
     async with engine.begin() as conn:
         await conn.run_sync(_migrate_game21_to_game_bot_schema)
         await conn.run_sync(Base.metadata.create_all)
-        await conn.run_sync(_ensure_fees_slot_percent)
+        await conn.run_sync(_ensure_fees_columns)
+        await conn.run_sync(_ensure_users_referrer_id)
+        await conn.run_sync(_ensure_checkers_columns)
+        await conn.run_sync(_ensure_kmb_columns)
         await conn.run_sync(_ensure_app_chats_button_titles)
         await conn.run_sync(_ensure_app_chats_game21_users)
+        await conn.run_sync(_ensure_app_chats_checkers_enabled)
         await conn.run_sync(_ensure_games_message_thread_id)
         await conn.run_sync(_ensure_games_announcement_general)
 

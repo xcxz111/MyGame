@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
 from database.models.payments.account import MBankAccount
+from database.repositories import checkers as checkers_repo
 from database.repositories import fees as fees_repo
 from database.repositories import game21_settings as g21_repo
 from database.repositories.payments import accounts as accounts_repo
@@ -38,7 +39,14 @@ from keyboards.admin_payments import (
 from locales.texts import get_lang, t
 from permissions import is_admin
 from settings import get_settings
-from states.admin_payments import MBankAccountState, SlotFeeState, WithdrawFeeState
+from states.admin_payments import (
+    CheckersFeeState,
+    KmbFeeState,
+    MBankAccountState,
+    ReferralFeeState,
+    SlotFeeState,
+    WithdrawFeeState,
+)
 from states.game21 import Game21FeeState
 
 logger = logging.getLogger(__name__)
@@ -367,6 +375,150 @@ async def on_slot_fee_input(
 
 
 # ── Game 21 fees ──────────────────────────────────────────────────────────────
+
+
+@router.callback_query(F.data == "admin:fees:checkers", F.message.chat.type == "private")
+async def on_checkers_fee_open(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    user: User,
+    state: FSMContext,
+) -> None:
+    lang = _resolve_lang(user, callback)
+    if await _deny_if_not_admin_cb(callback, user, lang):
+        return
+    percent = await checkers_repo.get_commission_percent(session)
+    await state.set_state(CheckersFeeState.waiting_percent)
+    await callback.message.edit_text(
+        t("admin_checkers_fee_title", lang).format(percent=_fmt_percent(percent)),
+    )
+    await callback.answer()
+
+
+@router.message(StateFilter(CheckersFeeState.waiting_percent), F.chat.type == "private")
+async def on_checkers_fee_input(
+    message: Message, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    lang = _resolve_lang(user, message)
+    if await _deny_if_not_admin_msg(message, user, lang):
+        await state.clear()
+        return
+    raw = (message.text or "").strip().replace(",", ".").rstrip("%").strip()
+    try:
+        percent = Decimal(raw)
+    except (InvalidOperation, ValueError):
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    if percent < 0 or percent > 100:
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    percent = percent.quantize(Decimal("0.01"))
+    await checkers_repo.set_commission_percent(session, percent)
+    await session.commit()
+    await state.clear()
+    await message.answer(
+        t("admin_checkers_fee_updated", lang).format(percent=_fmt_percent(percent))
+    )
+    await message.answer(
+        t("admin_fees_title", lang),
+        reply_markup=admin_fees_keyboard(lang),
+    )
+
+
+@router.callback_query(F.data == "admin:fees:kmb", F.message.chat.type == "private")
+async def on_kmb_fee_open(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    user: User,
+    state: FSMContext,
+) -> None:
+    lang = _resolve_lang(user, callback)
+    if await _deny_if_not_admin_cb(callback, user, lang):
+        return
+    percent = await fees_repo.get_kmb_percent(session)
+    await state.set_state(KmbFeeState.waiting_percent)
+    await callback.message.edit_text(
+        t("admin_kmb_fee_title", lang).format(percent=_fmt_percent(percent)),
+    )
+    await callback.answer()
+
+
+@router.message(StateFilter(KmbFeeState.waiting_percent), F.chat.type == "private")
+async def on_kmb_fee_input(
+    message: Message, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    lang = _resolve_lang(user, message)
+    if await _deny_if_not_admin_msg(message, user, lang):
+        await state.clear()
+        return
+    raw = (message.text or "").strip().replace(",", ".").rstrip("%").strip()
+    try:
+        percent = Decimal(raw)
+    except (InvalidOperation, ValueError):
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    if percent < 0 or percent > 100:
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    percent = percent.quantize(Decimal("0.01"))
+    await fees_repo.set_kmb_percent(session, percent)
+    await session.commit()
+    await state.clear()
+    await message.answer(
+        t("admin_kmb_fee_updated", lang).format(percent=_fmt_percent(percent))
+    )
+    await message.answer(
+        t("admin_fees_title", lang),
+        reply_markup=admin_fees_keyboard(lang),
+    )
+
+
+@router.callback_query(F.data == "admin:fees:referral", F.message.chat.type == "private")
+async def on_referral_fee_open(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    user: User,
+    state: FSMContext,
+) -> None:
+    lang = _resolve_lang(user, callback)
+    if await _deny_if_not_admin_cb(callback, user, lang):
+        return
+    percent = await fees_repo.get_referral_percent(session)
+    await state.set_state(ReferralFeeState.waiting_percent)
+    await callback.message.edit_text(
+        t("admin_referral_fee_title", lang).format(percent=_fmt_percent(percent)),
+    )
+    await callback.answer()
+
+
+@router.message(StateFilter(ReferralFeeState.waiting_percent), F.chat.type == "private")
+async def on_referral_fee_input(
+    message: Message, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    lang = _resolve_lang(user, message)
+    if await _deny_if_not_admin_msg(message, user, lang):
+        await state.clear()
+        return
+    raw = (message.text or "").strip().replace(",", ".").rstrip("%").strip()
+    try:
+        percent = Decimal(raw)
+    except (InvalidOperation, ValueError):
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    if percent < 0 or percent > 100:
+        await message.answer(t("admin_withdraw_fee_invalid", lang))
+        return
+    percent = percent.quantize(Decimal("0.01"))
+    await fees_repo.set_referral_percent(session, percent)
+    await session.commit()
+    await state.clear()
+    await message.answer(
+        t("admin_referral_fee_updated", lang).format(percent=_fmt_percent(percent))
+    )
+    await message.answer(
+        t("admin_fees_title", lang),
+        reply_markup=admin_fees_keyboard(lang),
+    )
 
 
 @router.callback_query(F.data == "admin:fees:21", F.message.chat.type == "private")

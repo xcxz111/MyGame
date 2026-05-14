@@ -16,6 +16,8 @@ async def get_or_create(session: AsyncSession) -> Fee:
             id=_SINGLETON_ID,
             withdraw_percent=Decimal("0.00"),
             slot_percent=Decimal("0.00"),
+            kmb_percent=Decimal("0.00"),
+            referral_percent=Decimal("0.00"),
         )
         session.add(fee)
         await session.flush()
@@ -44,5 +46,29 @@ async def get_slot_percent(session: AsyncSession) -> Decimal:
 async def set_slot_percent(session: AsyncSession, percent: Decimal) -> Fee:
     fee = await get_or_create(session)
     fee.slot_percent = percent
+    await session.flush()
+    return fee
+
+
+async def get_kmb_percent(session: AsyncSession) -> Decimal:
+    fee = await get_or_create(session)
+    return fee.kmb_percent or Decimal("0.00")
+
+
+async def set_kmb_percent(session: AsyncSession, percent: Decimal) -> Fee:
+    fee = await get_or_create(session)
+    fee.kmb_percent = percent
+    await session.flush()
+    return fee
+
+
+async def get_referral_percent(session: AsyncSession) -> Decimal:
+    fee = await get_or_create(session)
+    return fee.referral_percent or Decimal("0.00")
+
+
+async def set_referral_percent(session: AsyncSession, percent: Decimal) -> Fee:
+    fee = await get_or_create(session)
+    fee.referral_percent = percent
     await session.flush()
     return fee

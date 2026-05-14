@@ -33,6 +33,12 @@ def cabinet_menu_keyboard(
             )
         )
     builder.row(
+        InlineKeyboardButton(
+            text=t("btn_referral_program", lang),
+            callback_data="cabinet:referral",
+        )
+    )
+    builder.row(
         InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main"),
         InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
     )

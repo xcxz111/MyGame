@@ -43,6 +43,7 @@ from keyboards import (
 from locales.texts import get_lang, t
 from permissions import is_admin
 from services.forum_topic_allowlist import filter_topic_rows, general_play_allowed
+from services.games.busy import slot_busy_for_new_game
 from services.games.forum_thread import (
     format_forum_topic_display_label,
     pin_chat_message_in_forum,
@@ -112,6 +113,9 @@ async def _present_after_chat_selected(
     except Exception:
         is_forum = False
     if not is_forum:
+        if slot_busy_for_new_game(chat_id, None):
+            await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
+            return
         await state.set_state(AdminCreateGameState.waiting_participants)
         await state.update_data(
             chat_id=chat_id,
@@ -535,6 +539,9 @@ async def on_admin_games_create_forum_topic(
         if not await allowed_topics_repo.is_allowed_public(session, chat_id, None):
             await callback.answer(t("admin_game_topic_forbidden", lang), show_alert=True)
             return
+        if slot_busy_for_new_game(chat_id, None):
+            await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
+            return
         await state.update_data(message_thread_id=None, forum_topic_title=None)
     else:
         try:
@@ -544,6 +551,9 @@ async def on_admin_games_create_forum_topic(
             return
         if not await allowed_topics_repo.is_allowed_public(session, chat_id, tid):
             await callback.answer(t("admin_game_topic_forbidden", lang), show_alert=True)
+            return
+        if slot_busy_for_new_game(chat_id, tid):
+            await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
             return
         title = None
         for row in await forum_topics_repo.list_for_chat(session, chat_id):
@@ -751,12 +761,6 @@ async def on_admin_games_create_confirm(
     if await _deny_if_not_admin(callback, user, lang):
         return
 
-    # сразу убираем кнопки, чтобы исключить двойное создание
-    try:
-        await callback.message.edit_reply_markup(reply_markup=None)
-    except Exception:
-        pass
-
     data = await _materialize_state(state)
     game_type = GameType.ANY
     chat_id = int(data.get("chat_id") or 0)
@@ -769,6 +773,16 @@ async def on_admin_games_create_confirm(
     min_topup: Decimal = data.get("min_topup") or Decimal("0.00")
     min_topup_since: date | None = data.get("min_topup_since")
     message_thread_id: int | None = data.get("message_thread_id")
+
+    if slot_busy_for_new_game(chat_id, message_thread_id):
+        await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
+        return
+
+    # сразу убираем кнопки, чтобы исключить двойное создание
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
 
     prefix = t("admin_game_name_prefix", lang)
     if prefix == "admin_game_name_prefix":

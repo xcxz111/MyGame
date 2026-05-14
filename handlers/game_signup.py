@@ -17,6 +17,7 @@ from database.models import User
 from database.models.game import Game, GameStatus
 from database.models.payment_log import PaymentLogMethod
 from database.repositories import app_chats as app_chats_repo
+from database.repositories import checkers as checkers_repo
 from database.repositories import game21_settings as g21_repo
 from database.repositories import game_participants as gp_repo
 from database.repositories import games as games_repo
@@ -148,6 +149,7 @@ async def on_menu_signup(
     if not games:
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
+        show_checkers = await checkers_repo.is_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         await callback.message.edit_text(
             t("game_signup_no_games", lang),
@@ -157,6 +159,7 @@ async def on_menu_signup(
                 get_settings().admin_id,
                 menu_chats=menu_chats,
                 show_game21=show_game21,
+                show_checkers=show_checkers,
                 show_slot=show_slot,
             ),
         )

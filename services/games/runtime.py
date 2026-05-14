@@ -20,6 +20,7 @@ from database.models.game import Game, GameStatus, GameType
 from database.models.payment_log import PaymentLogMethod
 from database.models.user import User
 from database.repositories import app_chats as app_chats_repo
+from database.repositories import checkers as checkers_repo
 from database.repositories import game21_settings as g21_repo
 from database.repositories import game_participants as gp_repo
 from database.repositories import games as games_repo
@@ -189,6 +190,7 @@ async def send_5min_reminders(bot: Bot, session_maker: SessionMaker) -> None:
         games = await games_repo.list_for_5min_reminder(session, now)
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
+        show_checkers = await checkers_repo.is_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         for game in games:
             try:
@@ -221,6 +223,7 @@ async def send_5min_reminders(bot: Bot, session_maker: SessionMaker) -> None:
                             settings.admin_id,
                             menu_chats=menu_chats,
                             show_game21=show_game21,
+                            show_checkers=show_checkers,
                             show_slot=show_slot,
                         ),
                     )
@@ -266,6 +269,7 @@ async def _cancel_game_not_enough(
         ann_thread = g.message_thread_id
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
+        show_checkers = await checkers_repo.is_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         await session.commit()
 
@@ -310,6 +314,7 @@ async def _cancel_game_not_enough(
                     settings.admin_id,
                     menu_chats=menu_chats,
                     show_game21=show_game21,
+                    show_checkers=show_checkers,
                     show_slot=show_slot,
                 ),
             )
@@ -1248,6 +1253,7 @@ async def _do_tiebreak_and_winners(
     async with session_maker() as session:
         menu_chats = await app_chats_repo.list_for_main_menu(session)
         show_game21 = await g21_repo.any_game21_enabled(session)
+        show_checkers = await checkers_repo.is_enabled(session)
         show_slot = await slot_repo.is_enabled(session)
         prize_rows = await prizes_repo.for_game(session, game_id)
         by_place = {p.place_number: p.amount for p in prize_rows}
@@ -1282,6 +1288,7 @@ async def _do_tiebreak_and_winners(
                         settings.admin_id,
                         menu_chats=menu_chats,
                         show_game21=show_game21,
+                        show_checkers=show_checkers,
                         show_slot=show_slot,
                     ),
                 )

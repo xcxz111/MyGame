@@ -439,6 +439,12 @@ async def _finish_bot_lose(
     bot_total = int(st.get("bot_total") or 0)
     if st.get("session_id"):
         async with get_session_maker() as s2:
+            await users_repo.award_referral_percent(
+                s2,
+                referral_id=uid,
+                base_amount=bet,
+                source="game:21:bot",
+            )
             await _close_game21_bot_session_gb(s2, st, uid, "lose")
             await s2.commit()
     kb = await _play21_menu_for(bot, session, uid, lang)

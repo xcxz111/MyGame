@@ -99,13 +99,14 @@ async def on_menu_withdraw(
     session: AsyncSession,
     user: User,
     state: FSMContext,
+    bot: Bot,
 ) -> None:
     lang = _resolve_lang(user, callback)
 
     existing = await withdrawals_repo.get_pending_for_user(session, user.user_id)
     if existing is not None:
         await callback.answer(t("withdraw_already_pending", lang), show_alert=True)
-        await render_cabinet(callback, session, user)
+        await render_cabinet(callback, session, user, bot)
         return
 
     fee_percent = await fees_repo.get_withdraw_percent(session)
@@ -207,9 +208,10 @@ async def on_withdraw_confirm_no(
     session: AsyncSession,
     user: User,
     state: FSMContext,
+    bot: Bot,
 ) -> None:
     await state.clear()
-    await render_cabinet(callback, session, user)
+    await render_cabinet(callback, session, user, bot)
     await callback.answer()
 
 
@@ -246,7 +248,7 @@ async def on_withdraw_confirm_yes(
             t("withdraw_not_enough", lang).format(balance=_fmt(balance)),
             show_alert=True,
         )
-        await render_cabinet(callback, session, user)
+        await render_cabinet(callback, session, user, bot)
         return
 
     # повторная защита от дублирующего pending
@@ -254,7 +256,7 @@ async def on_withdraw_confirm_yes(
     if existing is not None:
         await state.clear()
         await callback.answer(t("withdraw_already_pending", lang), show_alert=True)
-        await render_cabinet(callback, session, user)
+        await render_cabinet(callback, session, user, bot)
         return
 
     fee_amount, payout = _calc_payout(amount, fee_percent)
@@ -319,7 +321,7 @@ async def on_withdraw_confirm_yes(
             blik=blik,
         ),
     )
-    await send_cabinet(callback.message, session, user)
+    await send_cabinet(callback.message, session, user, bot)
     await callback.answer()
 
 
@@ -330,13 +332,13 @@ async def on_withdraw_confirm_yes(
     F.data == "withdraw:cancel_ask", F.message.chat.type == "private"
 )
 async def on_withdraw_cancel_ask(
-    callback: CallbackQuery, session: AsyncSession, user: User
+    callback: CallbackQuery, session: AsyncSession, user: User, bot: Bot
 ) -> None:
     lang = _resolve_lang(user, callback)
     pending = await withdrawals_repo.get_pending_for_user(session, user.user_id)
     if pending is None:
         await callback.answer(t("withdraw_not_pending", lang), show_alert=True)
-        await render_cabinet(callback, session, user)
+        await render_cabinet(callback, session, user, bot)
         return
     await callback.message.edit_text(
         t("withdraw_cancel_ask", lang).format(id=pending.id),
@@ -363,7 +365,7 @@ async def on_withdraw_cancel_yes(
         or withdrawal.status != WithdrawalStatus.PENDING
     ):
         await callback.answer(t("withdraw_not_pending", lang), show_alert=True)
-        await render_cabinet(callback, session, user)
+        await render_cabinet(callback, session, user, bot)
         return
 
     # возвращаем деньги
@@ -404,7 +406,7 @@ async def on_withdraw_cancel_yes(
         .replace("</code>", ""),
         show_alert=True,
     )
-    await render_cabinet(callback, session, user)
+    await render_cabinet(callback, session, user, bot)
 
 
 async def _build_admin_text(
