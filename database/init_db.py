@@ -150,7 +150,7 @@ def _ensure_users_referrer_id(connection) -> None:
     for col, ddl in (
         (
             "level",
-            "SMALLINT NOT NULL DEFAULT 1 COMMENT 'Текущий уровень пользователя'",
+            "SMALLINT NOT NULL DEFAULT 0 COMMENT 'Текущий уровень пользователя'",
         ),
         (
             "level_win_bet_sum",
@@ -171,23 +171,57 @@ def _ensure_users_referrer_id(connection) -> None:
     ):
         if col not in cols:
             connection.execute(text(f"ALTER TABLE `users` ADD COLUMN `{col}` {ddl}"))
+    if "level" in cols:
+        connection.execute(
+            text(
+                "ALTER TABLE `users` MODIFY COLUMN `level` SMALLINT NOT NULL "
+                "DEFAULT 0 COMMENT 'Текущий уровень пользователя'"
+            )
+        )
 
 
 def _seed_user_levels(connection) -> None:
     insp = inspect(connection)
     if "user_levels" not in insp.get_table_names():
         return
+    has_level_zero = connection.execute(
+        text("SELECT 1 FROM `user_levels` WHERE `level` = 0 LIMIT 1")
+    ).first()
+    if has_level_zero is None:
+        connection.execute(text("UPDATE `user_levels` SET `level` = `level` - 1000"))
+        connection.execute(text("UPDATE `user_levels` SET `level` = `level` + 999"))
+        for level in range(1, 10):
+            connection.execute(
+                text(
+                    "UPDATE `user_levels` SET `title` = :new_title "
+                    "WHERE `level` = :level AND `title` = :old_title"
+                ),
+                {
+                    "level": level,
+                    "new_title": f"Уровень {level}",
+                    "old_title": f"Уровень {level + 1}",
+                },
+            )
+        if "users" in insp.get_table_names():
+            connection.execute(
+                text(
+                    "UPDATE `users` SET `level` = CASE "
+                    "WHEN `level` > 0 THEN `level` - 1 ELSE 0 END"
+                )
+            )
+
     rows = [
-        (1, "Начальный уровень", "0.00", "0.00", "0.00", "0.00"),
-        (2, "Уровень 2", "100.00", "10.00", "0.00", "0.00"),
-        (3, "Уровень 3", "1000.00", "30.00", "1.00", "0.00"),
-        (4, "Уровень 4", "5000.00", "50.00", "0.00", "0.00"),
-        (5, "Уровень 5", "10000.00", "100.00", "1.00", "1.00"),
-        (6, "Уровень 6", "25000.00", "0.00", "0.00", "0.00"),
-        (7, "Уровень 7", "50000.00", "0.00", "0.00", "0.00"),
-        (8, "Уровень 8", "100000.00", "0.00", "0.00", "0.00"),
-        (9, "Уровень 9", "250000.00", "0.00", "0.00", "0.00"),
-        (10, "Уровень 10", "500000.00", "0.00", "0.00", "0.00"),
+        (0, "Начальный уровень", "0.00", "0.00", "0.00", "0.00"),
+        (1, "Уровень 1", "100.00", "10.00", "0.00", "0.00"),
+        (2, "Уровень 2", "1000.00", "30.00", "1.00", "0.00"),
+        (3, "Уровень 3", "5000.00", "50.00", "0.00", "0.00"),
+        (4, "Уровень 4", "10000.00", "100.00", "1.00", "1.00"),
+        (5, "Уровень 5", "25000.00", "0.00", "0.00", "0.00"),
+        (6, "Уровень 6", "50000.00", "0.00", "0.00", "0.00"),
+        (7, "Уровень 7", "100000.00", "0.00", "0.00", "0.00"),
+        (8, "Уровень 8", "250000.00", "0.00", "0.00", "0.00"),
+        (9, "Уровень 9", "500000.00", "0.00", "0.00", "0.00"),
+        (10, "Уровень 10", "1000000.00", "0.00", "0.00", "0.00"),
     ]
     for level, title, required, reward, withdraw_discount, referral_bonus in rows:
         connection.execute(

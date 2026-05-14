@@ -700,6 +700,7 @@ async def on_edit_proxy_start(
         "🌐 Введите новый прокси в формате:\n"
         "<code>http://user:pass@host:port</code>\n"
         "<code>socks5://user:pass@host:port</code>"
+        f"\n\n{t('input_cancel_hint', lang)}"
     )
     await callback.answer()
 
@@ -752,7 +753,7 @@ async def on_edit_blik_start(
     account_id = int(callback.data.split(":")[-1])
     await state.set_state(MBankAccountState.edit_blik)
     await state.update_data(account_id=account_id)
-    await callback.message.edit_text("📱 Введите новый BLIK:")
+    await callback.message.edit_text(f"📱 Введите новый BLIK:\n\n{t('input_cancel_hint', lang)}")
     await callback.answer()
 
 
@@ -799,7 +800,8 @@ async def on_edit_limit_start(
         "• <code>1000</code> — лимит 1000 PLN, учитываются <b>все</b> входящие транзакции\n"
         "• <code>1000**</code> — лимит 1000 PLN, учитываются <b>только транзакции, созданные ботом</b>\n"
         "• <code>0</code> — лимит 0 PLN (аккаунт сразу уходит в сон)\n\n"
-        "Чтобы <b>снять лимит</b> — нажмите кнопку ниже.",
+        "Чтобы <b>снять лимит</b> — нажмите кнопку ниже."
+        f"\n\n{t('input_cancel_hint', lang)}",
         reply_markup=remove_limit_keyboard(),
     )
     await callback.answer()
@@ -880,6 +882,7 @@ async def on_add_start(
         "Введите данные в формате:\n"
         "<code>email:password:blik</code>\n\n"
         "Пример: <code>user@bank.com:pass123:+48123456789</code>"
+        f"\n\n{t('input_cancel_hint', lang)}"
     )
     await callback.answer()
 
@@ -942,6 +945,7 @@ async def on_add_bank_chosen(
         "<code>http://user:pass@host:port</code>\n"
         "<code>socks5://user:pass@host:port</code>\n\n"
         "Или нажмите «🚫 Без прокси»."
+        f"\n\n{t('input_cancel_hint', lang)}"
     )
     await callback.message.answer(
         "Если без прокси — нажмите кнопку ниже:",
@@ -963,7 +967,7 @@ async def on_add_bank_custom_start(
         await callback.answer()
         return
     await state.set_state(MBankAccountState.add_bank_custom)
-    await callback.message.edit_text("✏️ Введите название банка:")
+    await callback.message.edit_text(f"✏️ Введите название банка:\n\n{t('input_cancel_hint', lang)}")
     await callback.answer()
 
 
@@ -988,7 +992,8 @@ async def on_add_bank_custom_input(
         "🌐 Введите прокси в формате:\n"
         "<code>http://user:pass@host:port</code>\n"
         "<code>socks5://user:pass@host:port</code>\n\n"
-        "Или нажмите «🚫 Без прокси».",
+        "Или нажмите «🚫 Без прокси»."
+        f"\n\n{t('input_cancel_hint', lang)}",
         reply_markup=no_proxy_keyboard(),
     )
 

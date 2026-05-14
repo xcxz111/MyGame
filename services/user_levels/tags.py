@@ -24,7 +24,7 @@ async def ensure_level_tag(bot: Bot, *, chat_id: int, user_id: int, level: int) 
     """Ставит пользователю тег уровня в группе, с лёгким in-memory throttle."""
     chat_id = int(chat_id)
     user_id = int(user_id)
-    level = int(level or 1)
+    level = int(level or 0)
     now = time.time()
 
     failed_until = _fail_cache.get(chat_id)

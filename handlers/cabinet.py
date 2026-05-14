@@ -9,6 +9,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
+from database.repositories import user_levels as user_levels_repo
 from database.repositories import withdrawals as withdrawals_repo
 from database.repositories import users as users_repo
 from keyboards import cabinet_menu_keyboard
@@ -48,9 +49,24 @@ async def build_cabinet_view(
     """Возвращает (текст, клавиатуру) для экрана личного кабинета."""
     pending = await withdrawals_repo.get_pending_for_user(session, user.user_id)
     link = await _referral_link(bot, user.user_id)
+    level = int(user.level or 0)
+    progress = user.level_win_bet_sum or 0
+    next_level = await user_levels_repo.get_next_active_level(session, level)
+    if next_level is None:
+        next_level_text = t("cabinet_next_level_max", lang)
+    else:
+        remaining = max((next_level.required_win_bet_sum or 0) - progress, 0)
+        next_level_text = t("cabinet_next_level", lang).format(
+            level=int(next_level.level),
+            amount=_fmt_balance(remaining),
+        )
     text = (
         f"{t('cabinet_title', lang)}\n\n"
         + t("cabinet_balance", lang).format(balance=_fmt_balance(user.balance))
+        + "\n"
+        + t("cabinet_level", lang).format(level=level)
+        + "\n"
+        + next_level_text
         + "\n\n"
         + t("cabinet_referral_link", lang).format(link=link)
     )

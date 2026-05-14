@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import html
+import re
 import time
 from decimal import Decimal, InvalidOperation
 
@@ -64,6 +65,11 @@ from states.checkers import CheckersState
 
 router = Router(name="checkers")
 
+_CHECKERS_CHAT_COMMAND_RE = re.compile(
+    r"^/(?:checkers|draughts)(?:@[A-Za-z0-9_]+)?(?:\s*:\s*|\s+)(?P<amount>\d+(?:[,.]\d{1,2})?)\s*$",
+    re.IGNORECASE,
+)
+
 METHOD_CHECKERS_STAKE = "game:checkers:stake"
 METHOD_CHECKERS_WIN = "game:checkers:win"
 METHOD_CHECKERS_REFUND = "game:checkers:refund"
@@ -75,6 +81,16 @@ _turn_timeout_tasks: dict[tuple[int, int], asyncio.Task] = {}
 
 def _lang(user: User, event) -> str:
     return user.language_code or get_lang(getattr(event.from_user, "language_code", None))
+
+
+def _parse_checkers_chat_command(text: str | None) -> Decimal | None:
+    match = _CHECKERS_CHAT_COMMAND_RE.match((text or "").strip())
+    if not match:
+        return None
+    try:
+        return Decimal(match.group("amount").replace(",", "."))
+    except (InvalidOperation, AttributeError):
+        return None
 
 
 def _turn_user_id(st: dict) -> int:
@@ -756,6 +772,113 @@ async def on_checkers_confirm_yes(
         reply_markup=checkers_main_keyboard(lang),
     )
     await callback.answer()
+
+
+@router.message(
+    F.text.regexp(_CHECKERS_CHAT_COMMAND_RE),
+    F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}),
+    ~F.from_user.is_bot,
+)
+async def on_checkers_chat_command(message: Message, session: AsyncSession, user: User, bot: Bot) -> None:
+    lang = _lang(user, message)
+    bet = _parse_checkers_chat_command(message.text)
+    if bet is None or bet <= 0:
+        await message.reply(t("checkers_chat_command_usage", lang), parse_mode=ParseMode.HTML)
+        return
+    chat_id = message.chat.id
+    thread_id = message.message_thread_id
+    if message.chat.type != ChatType.SUPERGROUP:
+        thread_id = None
+    async with user_lock(user.user_id):
+        async with lock_for_chat(chat_id, thread_id):
+            if not await checkers_repo.is_enabled(session):
+                await message.reply(t("checkers_disabled", lang))
+                return
+            row = await app_chats_repo.get_by_chat_id(session, chat_id)
+            if row is None or not bool(row.checkers_enabled):
+                await message.reply(t("checkers_disabled", lang))
+                return
+            if thread_id is not None:
+                allowed = await allowed_topics_repo.is_allowed_public(session, chat_id, thread_id)
+                if not allowed:
+                    await message.reply(t("checkers_disabled", lang))
+                    return
+            if user_in_any_interactive_game(user.user_id):
+                await message.reply(t("checkers_active_notice", lang))
+                return
+            if slot_busy_for_new_game(chat_id, thread_id):
+                topic = await _room_place_label(session, lang, chat_id, thread_id)
+                await message.reply(t("game21_chat_command_active_exists", lang).format(topic=topic), parse_mode=ParseMode.HTML)
+                return
+            if await get_balance(session, user.user_id) < bet:
+                await message.reply(t("game21_not_enough_balance", lang))
+                return
+            settings = await checkers_repo.get_settings(session)
+            commission = Decimal(str(settings.commission_percent or "0"))
+            if not await take_balance(session, user.user_id, bet, method=METHOD_CHECKERS_STAKE):
+                await message.reply(t("game21_not_enough_balance", lang))
+                return
+            owner_name = message.from_user.full_name or message.from_user.username or str(user.user_id)
+            store_search(
+                user.user_id,
+                {
+                    "owner_user_id": user.user_id,
+                    "owner_name": owner_name,
+                    "chat_id": chat_id,
+                    "message_thread_id": thread_id,
+                    "bet_amount": bet,
+                    "commission_percent": commission,
+                    "lang": lang,
+                    "message_id": None,
+                    "message_id_general": None,
+                    "search_timeout_token": 0,
+                },
+            )
+            await session.commit()
+    win = possible_win_pvp(bet, commission)
+    text = t("checkers_search_post", lang).format(
+        user=name_link(user.user_id, owner_name),
+        amount=fmt_money(bet),
+        win=fmt_money(win),
+    )
+    markup = checkers_accept_keyboard(lang, user.user_id)
+    gen = None
+    try:
+        sent = await bot.send_message(chat_id, text, parse_mode=ParseMode.HTML, reply_markup=markup, **thread_kw(thread_id))
+        try:
+            await pin_chat_message_in_forum(bot, chat_id=chat_id, message_id=sent.message_id, message_thread_id=thread_id)
+        except Exception:
+            pass
+        if thread_id is not None:
+            gen = await bot.send_message(chat_id, text, parse_mode=ParseMode.HTML, reply_markup=markup)
+            try:
+                await pin_chat_message_in_forum(bot, chat_id=chat_id, message_id=gen.message_id, message_thread_id=None)
+            except Exception:
+                pass
+    except Exception:
+        pop_search(user.user_id)
+        await add_balance(session, user.user_id, bet, method=METHOD_CHECKERS_REFUND)
+        await session.commit()
+        for msg in (locals().get("sent"), gen):
+            if msg is not None:
+                try:
+                    await bot.delete_message(chat_id, msg.message_id)
+                except Exception:
+                    pass
+        await message.reply(t("game21_pvp_search_post_failed", lang))
+        return
+    token = int(time.time() * 1000)
+    meta = get_search(user.user_id)
+    if meta:
+        meta["message_id"] = sent.message_id
+        meta["message_id_general"] = gen.message_id if gen else None
+        meta["search_timeout_token"] = token
+        store_search(user.user_id, meta)
+    asyncio.create_task(_arm_search_timeout(bot, user.user_id, token))
+    await message.reply(
+        t("checkers_search_started", lang).format(amount=fmt_money(bet)),
+        reply_markup=checkers_main_keyboard(lang),
+    )
 
 
 async def _arm_search_timeout(bot: Bot, owner_id: int, token: int) -> None:

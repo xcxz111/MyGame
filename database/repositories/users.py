@@ -120,7 +120,7 @@ async def set_referral_percent(
 async def effective_withdraw_percent(session: AsyncSession, user: User) -> Decimal:
     global_percent = await fees_repo.get_withdraw_percent(session)
     level_discount, _ = await user_levels_repo.get_bonus_totals(
-        session, int(user.level or 1)
+        session, int(user.level or 0)
     )
     discount = (user.withdraw_percent or Decimal("0.00")) + level_discount
     effective = global_percent - discount
@@ -129,7 +129,7 @@ async def effective_withdraw_percent(session: AsyncSession, user: User) -> Decim
 
 async def effective_referral_percent(session: AsyncSession, user: User) -> Decimal:
     global_percent = await fees_repo.get_referral_percent(session)
-    _, level_bonus = await user_levels_repo.get_bonus_totals(session, int(user.level or 1))
+    _, level_bonus = await user_levels_repo.get_bonus_totals(session, int(user.level or 0))
     bonus = (user.referral_percent or Decimal("0.00")) + level_bonus
     return (global_percent + bonus).quantize(Decimal("0.01"))
 

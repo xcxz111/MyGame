@@ -85,6 +85,9 @@ TEXTS: dict[str, dict[str, str]] = {
         ),
         "cabinet_title": "💼 Личный кабинет",
         "cabinet_balance": "💰 Баланс: <b>{balance} PLN</b>",
+        "cabinet_level": "⭐ Уровень: <b>{level}</b>",
+        "cabinet_next_level": "📈 До уровня {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level_max": "📈 Следующий уровень: <b>максимальный уровень достигнут</b>",
         "cabinet_referral_link": "🔗 Ваша реферальная ссылка:\n<code>{link}</code>",
         "btn_referral_program": "🤝 Реферальная программа",
         "referral_program_text": (
@@ -137,6 +140,8 @@ TEXTS: dict[str, dict[str, str]] = {
         "btn_lang": "🌐",
         "btn_main": "🏠 Главная",
         "btn_back": "← Назад",
+        "btn_return_main": "вернуться на главную",
+        "input_cancel_hint": "нажмите /back для отмены",
         "admin_title": "Админка",
         "admin_no_access": "⛔ Нет доступа",
         "admin_btn_games": "🎯 Игры",
@@ -424,6 +429,20 @@ TEXTS: dict[str, dict[str, str]] = {
         "game21_pvp_not_member_title": "Вы не в игровом чате",
         "game21_pvp_not_member_intro": "Чтобы играть в 21 с пользователем, вступите в чат по ссылке ниже. После этого снова нажмите «Играть против пользователя в чате».",
         "game21_pvp_main_active_exists": "Нельзя создать запрос на игру так как там в данный момент проходит игра.",
+        "game21_chat_command_active_exists": "В данный момент в {topic} есть активная игра.",
+        "game21_chat_command_usage": "Используйте формат: <code>/21 10</code>",
+        "checkers_chat_command_usage": "Используйте формат: <code>/checkers 10</code>",
+        "kmb_chat_command_usage": "Используйте формат: <code>/kmb 10 3</code>, где 3 — до скольких побед играть.",
+        "info_command_text": (
+            "<b>Команды бота</b>\n\n"
+            "<code>/info</code> — показать это сообщение.\n"
+            "<code>/21 10</code> — создать игру в 21 PvP со ставкой 10 PLN.\n"
+            "<code>/checkers 10</code> — создать игру в шашки со ставкой 10 PLN.\n"
+            "<code>/kmb 10 3</code> — создать КМБ со ставкой 10 PLN, игра до 3 побед.\n"
+            "<code>/back</code> — отменить текущий ввод в личном чате.\n\n"
+            "Также работают старые форматы: <code>/play21:10</code>, "
+            "<code>/checkers:10</code>, <code>/kmb:10:3</code>, <code>/rps 10 3</code>."
+        ),
         "game21_pvp_active_exists": "В этом слоте уже идёт игра или поиск.",
         "game21_pvp_self_accept_forbidden": "Вы не можете играть сам с собой.",
         "game21_pvp_search_post": (
@@ -853,6 +872,9 @@ TEXTS: dict[str, dict[str, str]] = {
         ),
         "cabinet_title": "💼 Personal account",
         "cabinet_balance": "💰 Balance: <b>{balance} PLN</b>",
+        "cabinet_level": "⭐ Level: <b>{level}</b>",
+        "cabinet_next_level": "📈 Until level {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level_max": "📈 Next level: <b>maximum level reached</b>",
         "btn_signup": "Sign up for a game",
         "main_menu_chat_fallback": "💬 Chat",
         "btn_play_21_bot": "Play 21",
@@ -1029,6 +1051,20 @@ TEXTS: dict[str, dict[str, str]] = {
         "game21_pvp_not_member_title": "You're not in the game chat",
         "game21_pvp_not_member_intro": "To play 21 vs another user, join the chat using the link below, then tap «Play vs user in chat» again.",
         "game21_pvp_main_active_exists": "You can't create a game request there — a game is in progress.",
+        "game21_chat_command_active_exists": "There is an active game in {topic} right now.",
+        "game21_chat_command_usage": "Use this format: <code>/21 10</code>",
+        "checkers_chat_command_usage": "Use this format: <code>/checkers 10</code>",
+        "kmb_chat_command_usage": "Use this format: <code>/kmb 10 3</code>, where 3 is target wins.",
+        "info_command_text": (
+            "<b>Bot commands</b>\n\n"
+            "<code>/info</code> — show this message.\n"
+            "<code>/21 10</code> — create a PvP 21 game with a 10 PLN bet.\n"
+            "<code>/checkers 10</code> — create a checkers game with a 10 PLN bet.\n"
+            "<code>/kmb 10 3</code> — create an RPS game with a 10 PLN bet, first to 3 wins.\n"
+            "<code>/back</code> — cancel current input in private chat.\n\n"
+            "Old formats also work: <code>/play21:10</code>, "
+            "<code>/checkers:10</code>, <code>/kmb:10:3</code>, <code>/rps 10 3</code>."
+        ),
         "game21_pvp_active_exists": "This slot already has a game or search.",
         "game21_pvp_self_accept_forbidden": "You cannot accept your own request.",
         "game21_pvp_search_post": "{user} looks for a 21 opponent\n\nBet: {amount} PLN\nWin up to: {win} PLN\n\nBalance in bot {bot_link}",
@@ -1343,6 +1379,9 @@ TEXTS: dict[str, dict[str, str]] = {
         ),
         "cabinet_title": "💼 Особистий кабінет",
         "cabinet_balance": "💰 Баланс: <b>{balance} PLN</b>",
+        "cabinet_level": "⭐ Рівень: <b>{level}</b>",
+        "cabinet_next_level": "📈 До рівня {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level_max": "📈 Наступний рівень: <b>максимальний рівень досягнуто</b>",
         "btn_signup": "Записатися на гру",
         "main_menu_chat_fallback": "💬 Чат",
         "btn_play_21_bot": "Грати в 21",
@@ -1519,6 +1558,20 @@ TEXTS: dict[str, dict[str, str]] = {
         "game21_pvp_not_member_title": "Ви не в ігровому чаті",
         "game21_pvp_not_member_intro": "Щоб грати в 21 з іншим користувачем, увійдіть у чат за посиланням нижче. Потім знову оберіть у боті пункт гри з користувачем у чаті.",
         "game21_pvp_main_active_exists": "Неможливо створити запит на гру, бо там зараз триває гра.",
+        "game21_chat_command_active_exists": "Зараз у {topic} є активна гра.",
+        "game21_chat_command_usage": "Використовуйте формат: <code>/21 10</code>",
+        "checkers_chat_command_usage": "Використовуйте формат: <code>/checkers 10</code>",
+        "kmb_chat_command_usage": "Використовуйте формат: <code>/kmb 10 3</code>, де 3 — до скількох перемог грати.",
+        "info_command_text": (
+            "<b>Команди бота</b>\n\n"
+            "<code>/info</code> — показати це повідомлення.\n"
+            "<code>/21 10</code> — створити гру 21 PvP зі ставкою 10 PLN.\n"
+            "<code>/checkers 10</code> — створити гру в шашки зі ставкою 10 PLN.\n"
+            "<code>/kmb 10 3</code> — створити КМБ зі ставкою 10 PLN, гра до 3 перемог.\n"
+            "<code>/back</code> — скасувати поточне введення в особистому чаті.\n\n"
+            "Також працюють старі формати: <code>/play21:10</code>, "
+            "<code>/checkers:10</code>, <code>/kmb:10:3</code>, <code>/rps 10 3</code>."
+        ),
         "game21_pvp_active_exists": "This slot already has a game or search.",
         "game21_pvp_self_accept_forbidden": "You cannot accept your own request.",
         "game21_pvp_search_post": "{user} looks for a 21 opponent\n\nBet: {amount} PLN\nWin up to: {win} PLN\n\nBalance in bot {bot_link}",
@@ -1833,6 +1886,9 @@ TEXTS: dict[str, dict[str, str]] = {
         ),
         "cabinet_title": "💼 Konto osobiste",
         "cabinet_balance": "💰 Saldo: <b>{balance} PLN</b>",
+        "cabinet_level": "⭐ Poziom: <b>{level}</b>",
+        "cabinet_next_level": "📈 Do poziomu {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level_max": "📈 Następny poziom: <b>osiągnięto maksymalny poziom</b>",
         "btn_signup": "Zapisz się na grę",
         "main_menu_chat_fallback": "💬 Czat",
         "btn_play_21_bot": "Graj w 21",
@@ -2009,6 +2065,20 @@ TEXTS: dict[str, dict[str, str]] = {
         "game21_pvp_not_member_title": "Nie jesteś na czacie gry",
         "game21_pvp_not_member_intro": "Aby grać w 21 z innym użytkownikiem, dołącz do czatu przez poniższy link, a potem ponownie wybierz w bocie grę z użytkownikiem na czacie.",
         "game21_pvp_main_active_exists": "Nie można utworzyć zaproszenia do gry, ponieważ tam właśnie trwa gra.",
+        "game21_chat_command_active_exists": "W {topic} jest teraz aktywna gra.",
+        "game21_chat_command_usage": "Użyj formatu: <code>/21 10</code>",
+        "checkers_chat_command_usage": "Użyj formatu: <code>/checkers 10</code>",
+        "kmb_chat_command_usage": "Użyj formatu: <code>/kmb 10 3</code>, gdzie 3 to liczba zwycięstw.",
+        "info_command_text": (
+            "<b>Komendy bota</b>\n\n"
+            "<code>/info</code> — pokaż tę wiadomość.\n"
+            "<code>/21 10</code> — utwórz grę 21 PvP ze stawką 10 PLN.\n"
+            "<code>/checkers 10</code> — utwórz grę w warcaby ze stawką 10 PLN.\n"
+            "<code>/kmb 10 3</code> — utwórz grę KMB ze stawką 10 PLN, gra do 3 zwycięstw.\n"
+            "<code>/back</code> — anuluj bieżące wprowadzanie w czacie prywatnym.\n\n"
+            "Działają też stare formaty: <code>/play21:10</code>, "
+            "<code>/checkers:10</code>, <code>/kmb:10:3</code>, <code>/rps 10 3</code>."
+        ),
         "game21_pvp_active_exists": "This slot already has a game or search.",
         "game21_pvp_self_accept_forbidden": "You cannot accept your own request.",
         "game21_pvp_search_post": "{user} looks for a 21 opponent\n\nBet: {amount} PLN\nWin up to: {win} PLN\n\nBalance in bot {bot_link}",
@@ -2260,8 +2330,55 @@ def get_lang(language_code: Optional[str]) -> str:
     return lang if lang in TEXTS else DEFAULT_LANG
 
 
+INPUT_HINT_KEYS = {
+    "topup_enter_amount",
+    "withdraw_enter_amount",
+    "withdraw_enter_blik",
+    "slot_enter_bet_with_balance",
+    "admin_slot_rules_prompt",
+    "admin_checkers_rules_prompt",
+    "admin_kmb_rules_prompt",
+    "admin_user_search_prompt",
+    "admin_user_topup_prompt",
+    "admin_user_withdraw_prompt",
+    "admin_user_referral_prompt",
+    "admin_levels_prompt_title",
+    "admin_levels_prompt_required",
+    "admin_levels_prompt_reward",
+    "admin_levels_prompt_withdraw",
+    "admin_levels_prompt_referral",
+    "admin_withdraw_fee_title",
+    "admin_slot_fee_title",
+    "admin_checkers_fee_title",
+    "admin_kmb_fee_title",
+    "admin_referral_fee_title",
+    "admin_game21_fee_bot_title",
+    "admin_game21_fee_users_title",
+    "admin_21_rules_prompt_bot",
+    "admin_21_rules_prompt_users",
+    "game21_enter_bet",
+    "game21_pvp_enter_bet",
+    "checkers_enter_bet",
+    "kmb_enter_wins",
+    "kmb_enter_bet",
+    "admin_chats_enter_button_title",
+    "admin_chats_enter_chat_id",
+    "admin_game_enter_participants",
+    "admin_game_enter_prizes",
+    "admin_game_enter_min_topup",
+    "admin_game_enter_entry_fee",
+    "admin_game_enter_datetime",
+}
+
+
 def t(key: str, language_code: Optional[str] = None) -> str:
     lang = get_lang(language_code)
-    return TEXTS.get(lang, TEXTS[DEFAULT_LANG]).get(
+    value = TEXTS.get(lang, TEXTS[DEFAULT_LANG]).get(
         key, TEXTS[DEFAULT_LANG].get(key, key)
     )
+    if key in INPUT_HINT_KEYS and "/back" not in value:
+        hint = TEXTS.get(lang, TEXTS[DEFAULT_LANG]).get(
+            "input_cancel_hint", TEXTS[DEFAULT_LANG]["input_cancel_hint"]
+        )
+        value = f"{value}\n\n{hint}"
+    return value

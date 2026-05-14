@@ -72,7 +72,7 @@ def _kb(lang: str) -> InlineKeyboardMarkup:
             callback_data="admin:checkers:enable",
         )
     )
-    b.row(InlineKeyboardButton(text=t("admin_checkers_btn_rules", lang), callback_data="admin:checkers:rules"))
+    b.row(InlineKeyboardButton(text=t("admin_checkers_btn_rules", lang), callback_data="admin:checkers:rules", style="danger"))
     b.row(
         InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
         InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
@@ -113,7 +113,7 @@ async def _collect_chat_rows(bot: Bot, session: AsyncSession) -> list[tuple[int,
 
 def _rules_kb(lang: str) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
-    b.row(InlineKeyboardButton(text=t("admin_checkers_btn_rules", lang), callback_data="admin:checkers:rules:edit"))
+    b.row(InlineKeyboardButton(text=t("admin_checkers_btn_rules", lang), callback_data="admin:checkers:rules:edit", style="danger"))
     b.row(
         InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:checkers", style="primary"),
         InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),

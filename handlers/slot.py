@@ -78,6 +78,7 @@ def _admin_slot_keyboard(lang: str, *, enabled: bool) -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text=t("admin_slot_btn_rules", lang),
             callback_data="admin:casino:rules",
+            style="danger",
         )
     )
     builder.row(

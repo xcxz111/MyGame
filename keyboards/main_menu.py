@@ -72,7 +72,7 @@ def main_menu_keyboard(
         builder.add(chat_btn)
 
     if admin_telegram_id is not None and int(user_id) == int(admin_telegram_id):
-        builder.add(InlineKeyboardButton(text=t("btn_admin", lang), callback_data="menu:admin"))
+        builder.add(InlineKeyboardButton(text=t("btn_admin", lang), callback_data="menu:admin", style="danger"))
 
     builder.add(InlineKeyboardButton(text=t("btn_lang", lang), callback_data="menu:lang", style="primary"))
     builder.adjust(1)

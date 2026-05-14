@@ -70,9 +70,12 @@ def admin_chats_delete_confirm_keyboard(
         InlineKeyboardButton(
             text=t("withdraw_btn_yes", lang),
             callback_data=f"admin:chats:delete:yes:{chat_id}",
+            style="success",
         ),
         InlineKeyboardButton(
-            text=t("withdraw_btn_no", lang), callback_data="admin:settings:chats"
+            text=t("withdraw_btn_no", lang),
+            callback_data="admin:settings:chats",
+            style="danger",
         ),
     )
     return builder.as_markup()

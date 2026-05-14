@@ -1,8 +1,9 @@
 """Обработчики кнопок главного меню."""
 
 from aiogram import F, Router
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
@@ -21,6 +22,47 @@ router = Router(name="menu")
 def _user_lang(user: User, callback: CallbackQuery) -> str:
     """Язык из БД, а если ещё не выбран — по подсказке клиента Telegram."""
     return user.language_code or get_lang(callback.from_user.language_code)
+
+
+def _message_lang(user: User, message: Message) -> str:
+    return user.language_code or get_lang(getattr(message.from_user, "language_code", None))
+
+
+async def _send_main_menu_message(
+    message: Message, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    await state.clear()
+    settings = get_settings()
+    lang = user.language_code or get_lang(message.from_user.language_code)
+    menu_chats = await app_chats_repo.list_for_main_menu(session)
+    show_game21 = await g21_repo.any_game21_enabled(session)
+    show_checkers = await checkers_repo.is_enabled(session)
+    show_slot = await slot_repo.is_enabled(session)
+    await message.answer(
+        build_welcome_text(lang, user.user_id, user.balance),
+        reply_markup=main_menu_keyboard(
+            lang,
+            user.user_id,
+            settings.admin_id,
+            menu_chats=menu_chats,
+            show_game21=show_game21,
+            show_checkers=show_checkers,
+            show_slot=show_slot,
+        ),
+    )
+
+
+@router.message(Command("back"), F.chat.type == "private")
+async def on_back_command(
+    message: Message, session: AsyncSession, user: User, state: FSMContext
+) -> None:
+    await _send_main_menu_message(message, session, user, state)
+
+
+@router.message(Command("info"))
+async def on_info_command(message: Message, user: User) -> None:
+    lang = _message_lang(user, message)
+    await message.answer(t("info_command_text", lang), parse_mode="HTML")
 
 
 @router.callback_query(F.data == "menu:lang", F.message.chat.type == "private")

@@ -23,10 +23,12 @@ def withdraw_confirm_keyboard(language_code: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text=t("withdraw_btn_yes", lang),
             callback_data="withdraw:confirm_yes",
+            style="success",
         ),
         InlineKeyboardButton(
             text=t("withdraw_btn_no", lang),
             callback_data="withdraw:confirm_no",
+            style="danger",
         ),
     )
     return builder.as_markup()
@@ -42,10 +44,12 @@ def withdraw_cancel_confirm_keyboard(
         InlineKeyboardButton(
             text=t("withdraw_btn_yes", lang),
             callback_data=f"withdraw:cancel_yes:{withdrawal_id}",
+            style="success",
         ),
         InlineKeyboardButton(
             text=t("withdraw_btn_no", lang),
             callback_data="menu:cabinet",
+            style="danger",
         ),
     )
     return builder.as_markup()

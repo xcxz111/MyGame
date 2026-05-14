@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import html
 import logging
+import re
 import time
 from decimal import Decimal, InvalidOperation
 
@@ -81,6 +82,11 @@ logger = logging.getLogger(__name__)
 
 router = Router(name="game21")
 
+_PLAY21_CHAT_COMMAND_RE = re.compile(
+    r"^/(?:play21|21)(?:@[A-Za-z0-9_]+)?(?:\s*:\s*|\s+)(?P<amount>\d+(?:[,.]\d{1,2})?)\s*$",
+    re.IGNORECASE,
+)
+
 
 def _lang(user: User, ev) -> str:
     return user.language_code or get_lang(getattr(ev.from_user, "language_code", None))
@@ -94,6 +100,31 @@ async def _edit_text_skip_not_modified(message: Message, *args, **kwargs) -> Non
         if "message is not modified" in desc:
             return
         raise
+
+
+async def _topic_label(session: AsyncSession, lang: str, chat_id: int, thread_id: int | None) -> str:
+    if thread_id is None:
+        return t("game21_pvp_topic_general", lang)
+    topics = await forum_topics_repo.list_for_chat(session, chat_id)
+    for topic in topics:
+        if int(topic.message_thread_id) == int(thread_id):
+            return format_forum_topic_display_label(
+                lang,
+                message_thread_id=int(thread_id),
+                name=topic.name,
+            )
+    return format_forum_topic_display_label(lang, message_thread_id=int(thread_id), name="")
+
+
+def _parse_play21_chat_command(text: str | None) -> Decimal | None:
+    match = _PLAY21_CHAT_COMMAND_RE.match((text or "").strip())
+    if not match:
+        return None
+    try:
+        amount = Decimal(match.group("amount").replace(",", ".")).quantize(Decimal("0.01"))
+    except (InvalidOperation, ValueError):
+        return None
+    return amount if amount > 0 else None
 
 
 async def _edit_reply_markup_skip_not_modified(message: Message, **kwargs) -> None:
@@ -820,7 +851,6 @@ async def on_pvp_confirm_yes(
     if slot_busy_for_new_game(game_chat_id, thread_id):
         await callback.answer(t("game21_pvp_main_active_exists", lang), show_alert=True)
         return
-    sk = slot_key(game_chat_id, thread_id)
     lock = lock_for_chat(game_chat_id, thread_id)
     async with user_game21_lock(user.user_id):
         async with lock:
@@ -900,6 +930,123 @@ async def on_pvp_confirm_yes(
         ),
     )
     await callback.answer()
+
+
+@router.message(
+    F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}),
+    F.text.regexp(_PLAY21_CHAT_COMMAND_RE),
+    ~F.from_user.is_bot,
+)
+async def on_play21_chat_command(
+    message: Message, session: AsyncSession, user: User, bot: Bot
+) -> None:
+    lang = _lang(user, message)
+    if message.chat is None or message.from_user is None:
+        return
+    game_chat_id = int(message.chat.id)
+    thread_id = message.message_thread_id
+    thread_id = int(thread_id) if thread_id is not None else None
+
+    bet = _parse_play21_chat_command(message.text)
+    if bet is None:
+        await message.answer(t("game21_chat_command_usage", lang), parse_mode=ParseMode.HTML)
+        return
+
+    chat_row = await app_chats_repo.get_by_chat_id(session, game_chat_id)
+    if chat_row is None or not bool(chat_row.game21_users_enabled):
+        await message.answer(t("game21_pvp_no_available_chat", lang))
+        return
+    if not await allowed_topics_repo.is_allowed_public(session, game_chat_id, thread_id):
+        await message.answer(t("game21_pvp_topic_forbidden", lang))
+        return
+    if slot_busy_for_new_game(game_chat_id, thread_id):
+        topic = await _topic_label(session, lang, game_chat_id, thread_id)
+        await message.answer(
+            t("game21_chat_command_active_exists", lang).format(topic=html.escape(topic)),
+            parse_mode=ParseMode.HTML,
+        )
+        return
+    if user_in_any_interactive_game(user.user_id):
+        await message.answer(t("game21_active_notice", lang))
+        return
+    if (user.balance or Decimal("0")) < bet:
+        await message.answer(t("game21_not_enough_balance", lang))
+        return
+
+    settings = await g21_repo.get_settings(session)
+    commission = settings.commission_users_percent or Decimal("0")
+    sk = slot_key(game_chat_id, thread_id)
+    lock = lock_for_chat(game_chat_id, thread_id)
+    owner_name = (
+        message.from_user.full_name
+        or message.from_user.username
+        or str(user.user_id)
+    ).strip()
+
+    async with user_game21_lock(user.user_id):
+        async with lock:
+            if slot_busy_for_new_game(game_chat_id, thread_id):
+                topic = await _topic_label(session, lang, game_chat_id, thread_id)
+                await message.answer(
+                    t("game21_chat_command_active_exists", lang).format(topic=html.escape(topic)),
+                    parse_mode=ParseMode.HTML,
+                )
+                return
+            if user_in_any_interactive_game(user.user_id):
+                await message.answer(t("game21_active_notice", lang))
+                return
+            ok = await take_balance(session, user.user_id, bet, method=METHOD_PVP_STAKE)
+            if not ok:
+                await message.answer(t("game21_not_enough_balance", lang))
+                return
+            store_search(
+                user.user_id,
+                {
+                    "owner_user_id": user.user_id,
+                    "bet_amount": bet,
+                    "commission_percent": commission,
+                    "chat_id": game_chat_id,
+                    "message_thread_id": thread_id,
+                    "message_id": None,
+                    "message_id_general": None,
+                    "search_timeout_token": 0,
+                    "lang": lang,
+                    "owner_name": owner_name,
+                },
+            )
+            await session.commit()
+
+    kb = play21_pvp_accept_keyboard(lang, user.user_id)
+    mid_t, mid_g = await post_dual_search(
+        bot,
+        chat_id=game_chat_id,
+        message_thread_id=thread_id,
+        lang=lang,
+        owner_id=user.user_id,
+        owner_name=owner_name,
+        bet=bet,
+        commission_percent=commission,
+        accept_markup=kb,
+    )
+    if mid_t is None:
+        async with user_game21_lock(user.user_id):
+            async with lock:
+                pop_search(user.user_id)
+        await add_balance(session, user.user_id, bet, method=METHOD_PVP_REFUND)
+        await session.commit()
+        await message.answer(t("game21_pvp_search_post_failed", lang))
+        return
+
+    token = int(time.time() * 1000)
+    async with user_game21_lock(user.user_id):
+        async with lock:
+            meta = get_search(user.user_id)
+            if meta:
+                meta["message_id"] = mid_t
+                meta["message_id_general"] = mid_g
+                meta["search_timeout_token"] = token
+                store_search(user.user_id, meta)
+    asyncio.create_task(arm_search_timeout(bot, user.user_id, token))
 
 
 @router.callback_query(

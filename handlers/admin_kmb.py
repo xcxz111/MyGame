@@ -67,6 +67,7 @@ def _kb(lang: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text=t("admin_kmb_btn_rules", lang),
             callback_data="admin:kmb:rules",
+            style="danger",
         )
     )
     builder.row(
@@ -82,6 +83,7 @@ def _rules_kb(lang: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text=t("admin_kmb_btn_rules", lang),
             callback_data="admin:kmb:rules:edit",
+            style="danger",
         )
     )
     builder.row(

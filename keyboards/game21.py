@@ -6,6 +6,14 @@ from services.games.forum_thread import format_forum_topic_display_label
 from services.games.busy import slot_busy_for_new_game
 
 
+def _return_main_button(lang: str) -> InlineKeyboardButton:
+    return InlineKeyboardButton(
+        text=t("btn_return_main", lang),
+        callback_data="menu:main",
+        style="primary",
+    )
+
+
 def play21_menu_keyboard(lang: str, *, bot_on: bool, pvp_on: bool) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     if bot_on:
@@ -20,15 +28,7 @@ def play21_menu_keyboard(lang: str, *, bot_on: bool, pvp_on: bool) -> InlineKeyb
                 text=t("game21_btn_vs_user_chat", lang), callback_data="menu:play21bot:pvp"
             )
         )
-    builder.row(
-        InlineKeyboardButton(
-            text=t("game21_btn_rules", lang), callback_data="menu:play21bot:rules"
-        )
-    )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
@@ -41,45 +41,33 @@ def play21_busy_keyboard(lang: str, *, show_cancel_search: bool = False) -> Inli
                 callback_data="menu:play21bot:cancel:active",
             )
         )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
 def play21_rules_back_keyboard(lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
 def play21_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("game21_btn_yes", lang), callback_data="menu:play21bot:confirm:yes"),
-        InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:play21bot:confirm:no"),
+        InlineKeyboardButton(text=t("game21_btn_yes", lang), callback_data="menu:play21bot:confirm:yes", style="success"),
+        InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:play21bot:confirm:no", style="danger"),
     )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
 def play21_pvp_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("game21_btn_yes", lang), callback_data="menu:play21bot:pvp:confirm:yes"),
-        InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:play21bot:pvp:confirm:no"),
+        InlineKeyboardButton(text=t("game21_btn_yes", lang), callback_data="menu:play21bot:pvp:confirm:yes", style="success"),
+        InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:play21bot:pvp:confirm:no", style="danger"),
     )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
@@ -92,10 +80,7 @@ def play21_pvp_chat_pick_keyboard(lang: str, chats: list[tuple[int, str]]) -> In
                 callback_data=f"menu:play21bot:pvp:chat:{cid}",
             )
         )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
@@ -129,10 +114,7 @@ def play21_pvp_topic_pick_keyboard(
                 callback_data=f"menu:play21bot:pvp:th:{chat_id}:{tid}",
             )
         )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot:pvp", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 

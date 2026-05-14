@@ -39,6 +39,6 @@ class LevelTagMiddleware(BaseMiddleware):
                     bot,
                     chat_id=int(event.chat.id),
                     user_id=int(user.user_id),
-                    level=int(user.level or 1),
+                    level=int(user.level or 0),
                 )
         return await handler(event, data)

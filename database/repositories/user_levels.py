@@ -22,6 +22,20 @@ async def get_level(session: AsyncSession, level: int) -> UserLevel | None:
     return await session.get(UserLevel, int(level))
 
 
+async def get_next_active_level(session: AsyncSession, level: int) -> UserLevel | None:
+    return (
+        await session.execute(
+            select(UserLevel)
+            .where(
+                UserLevel.active == 1,
+                UserLevel.level > int(level),
+            )
+            .order_by(UserLevel.level.asc())
+            .limit(1)
+        )
+    ).scalar_one_or_none()
+
+
 async def set_title(session: AsyncSession, level: int, title: str | None) -> UserLevel | None:
     row = await get_level(session, level)
     if row is None:
@@ -124,7 +138,7 @@ async def add_winning_bet_progress(
         return None
 
     user.level_win_bet_sum = (user.level_win_bet_sum or Decimal("0")) + bet_amount
-    current_level = int(user.level or 1)
+    current_level = int(user.level or 0)
     target = (
         await session.execute(
             select(UserLevel)

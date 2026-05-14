@@ -77,7 +77,7 @@ def _fmt_percent(v) -> str:
 def _main_kb(lang: str) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     b.row(InlineKeyboardButton(text=t("admin_21_btn_enable", lang), callback_data="admin:21:enable"))
-    b.row(InlineKeyboardButton(text=t("admin_21_btn_rules", lang), callback_data="admin:21:rules"))
+    b.row(InlineKeyboardButton(text=t("admin_21_btn_rules", lang), callback_data="admin:21:rules", style="danger"))
     b.row(
         InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
         InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),

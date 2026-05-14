@@ -4,14 +4,19 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from locales.texts import t
 
 
+def _return_main_button(lang: str) -> InlineKeyboardButton:
+    return InlineKeyboardButton(
+        text=t("btn_return_main", lang),
+        callback_data="menu:main",
+        style="primary",
+    )
+
+
 def kmb_chat_pick_keyboard(lang: str, chats: list[tuple[int, str]]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for cid, title in chats:
         builder.row(InlineKeyboardButton(text=title[:64], callback_data=f"menu:kmb:chat:{cid}"))
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
@@ -35,23 +40,17 @@ def kmb_topic_pick_keyboard(
         builder.row(
             InlineKeyboardButton(text=f"{em} {name}"[:64], callback_data=f"menu:kmb:th:{chat_id}:{tid}")
         )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data=back_callback_data, style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
 def kmb_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("game21_btn_yes", lang), callback_data="menu:kmb:confirm:yes"),
-        InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:kmb:confirm:no"),
+        InlineKeyboardButton(text=t("game21_btn_yes", lang), callback_data="menu:kmb:confirm:yes", style="success"),
+        InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:kmb:confirm:no", style="danger"),
     )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:kmb", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 
@@ -70,7 +69,7 @@ def kmb_accept_keyboard(lang: str, owner_id: int) -> InlineKeyboardMarkup:
 
 def kmb_main_keyboard(lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary")]]
+        inline_keyboard=[[_return_main_button(lang)]]
     )
 
 
@@ -83,10 +82,7 @@ def kmb_busy_keyboard(lang: str, *, show_cancel_search: bool = False) -> InlineK
                 callback_data="menu:kmb:cancel:active",
             )
         )
-    builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
-    )
+    builder.row(_return_main_button(lang))
     return builder.as_markup()
 
 

@@ -53,8 +53,8 @@ class User(Base):
     level: Mapped[int] = mapped_column(
         SmallInteger,
         nullable=False,
-        default=1,
-        server_default="1",
+        default=0,
+        server_default="0",
         comment="Текущий уровень пользователя",
     )
     level_win_bet_sum: Mapped[Decimal] = mapped_column(

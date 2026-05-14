@@ -177,7 +177,7 @@ async def _user_card_text(session: AsyncSession, target: User, lang: str) -> str
     global_withdraw = await fees_repo.get_withdraw_percent(session)
     global_referral = await fees_repo.get_referral_percent(session)
     level_withdraw_discount, level_referral_bonus = await user_levels_repo.get_bonus_totals(
-        session, int(target.level or 1)
+        session, int(target.level or 0)
     )
     effective_withdraw = await users_repo.effective_withdraw_percent(session, target)
     effective_referral = await users_repo.effective_referral_percent(session, target)
@@ -222,7 +222,7 @@ async def _user_card_text(session: AsyncSession, target: User, lang: str) -> str
         username=escape(f"@{target.user_name}" if target.user_name else "—"),
         status=status,
         balance=_fmt_money(target.balance),
-        level=int(target.level or 1),
+        level=int(target.level or 0),
         level_progress=_fmt_money(target.level_win_bet_sum),
         level_withdraw_discount=_fmt_percent(level_withdraw_discount),
         level_referral_bonus=_fmt_percent(level_referral_bonus),
