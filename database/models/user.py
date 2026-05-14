@@ -50,6 +50,20 @@ class User(Base):
         default=Decimal("0.00"),
         server_default="0.00",
     )
+    level: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False,
+        default=1,
+        server_default="1",
+        comment="Текущий уровень пользователя",
+    )
+    level_win_bet_sum: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2),
+        nullable=False,
+        default=Decimal("0.00"),
+        server_default="0.00",
+        comment="Сумма выигранных ставок для прогресса уровня",
+    )
     status: Mapped[int] = mapped_column(
         SmallInteger,
         nullable=False,
@@ -74,6 +88,18 @@ class User(Base):
         nullable=True,
         default=None,
         comment="Telegram user_id пригласившего пользователя",
+    )
+    withdraw_percent: Mapped[Decimal | None] = mapped_column(
+        Numeric(5, 2),
+        nullable=True,
+        default=None,
+        comment="Персональная скидка к комиссии вывода, NULL = без скидки",
+    )
+    referral_percent: Mapped[Decimal | None] = mapped_column(
+        Numeric(5, 2),
+        nullable=True,
+        default=None,
+        comment="Персональная надбавка к реферальному проценту, NULL = без надбавки",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,

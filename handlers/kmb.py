@@ -22,6 +22,7 @@ from database.repositories import app_chats as app_chats_repo
 from database.repositories import fees as fees_repo
 from database.repositories import forum_topics as forum_topics_repo
 from database.repositories import kmb as kmb_repo
+from database.repositories import user_levels as user_levels_repo
 from database.repositories import users as users_repo
 from keyboards.kmb import (
     kmb_accept_keyboard,
@@ -47,6 +48,7 @@ from services.games.forum_thread import (
     thread_kw,
     unpin_chat_message_in_forum,
 )
+from services.user_levels import ensure_level_tag
 from services.kmb.state import (
     get_live,
     get_search,
@@ -112,6 +114,7 @@ async def _present_kmb_topics(
     session: AsyncSession,
     lang: str,
     cid: int,
+    back_callback_data: str = "menu:kmb",
 ) -> str:
     allowed = await allowed_topics_repo.effective_allowed_public_threads(session, cid)
     if allowed == frozenset():
@@ -132,7 +135,12 @@ async def _present_kmb_topics(
             await message.edit_text(
                 t("kmb_choose_topic", lang),
                 reply_markup=kmb_topic_pick_keyboard(
-                    lang, chat_id=cid, topics=topics, busy=busy, include_general=include_general
+                    lang,
+                    chat_id=cid,
+                    topics=topics,
+                    busy=busy,
+                    include_general=include_general,
+                    back_callback_data=back_callback_data,
                 ),
             )
         except TelegramBadRequest as exc:
@@ -351,7 +359,11 @@ async def on_kmb_menu(
         return
     if len(chats) == 1:
         res = await _present_kmb_topics(
-            callback.message, session=session, lang=lang, cid=chats[0][0]
+            callback.message,
+            session=session,
+            lang=lang,
+            cid=chats[0][0],
+            back_callback_data="menu:main",
         )
         if res == "no_chat":
             await callback.answer(t("game21_pvp_no_available_chat", lang), show_alert=True)
@@ -818,6 +830,19 @@ async def on_kmb_pick(callback: CallbackQuery, session: AsyncSession, bot: Bot) 
         commission_amount = ((bet * 2) - payout).quantize(Decimal("0.01"))
         player_commission_base = (commission_amount / Decimal("2")).quantize(Decimal("0.01"))
         await add_balance(session, winner_id, payout, method=METHOD_KMB_WIN)
+        new_level = await user_levels_repo.add_winning_bet_progress(
+            session,
+            user_id=winner_id,
+            bet_amount=bet,
+            source="game:kmb",
+        )
+        if new_level is not None:
+            await ensure_level_tag(
+                bot,
+                chat_id=int(st["chat_id"]),
+                user_id=winner_id,
+                level=new_level,
+            )
         for uid in (p1, p2):
             await users_repo.award_referral_percent(
                 session,

@@ -76,7 +76,9 @@ def _game_view_markup(
         )
     b.row(
         InlineKeyboardButton(
-            text=t("btn_back", lang), callback_data="menu:signup"
+            text=t("btn_back", lang),
+            callback_data="menu:signup",
+            style="primary",
         )
     )
     return b
@@ -174,7 +176,7 @@ async def on_menu_signup(
         )
         b.row(InlineKeyboardButton(text=label, callback_data=f"game:signup:{g.id}"))
     b.row(
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main")
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary")
     )
     await callback.message.edit_text(
         t("game_signup_list_title", lang), reply_markup=b.as_markup()

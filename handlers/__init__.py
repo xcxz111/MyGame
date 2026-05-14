@@ -6,6 +6,7 @@ from handlers.admin_checkers import router as admin_checkers_router
 from handlers.admin_game21 import router as admin_game21_router
 from handlers.admin_games import router as admin_games_router
 from handlers.admin_kmb import router as admin_kmb_router
+from handlers.admin_levels import router as admin_levels_router
 from handlers.admin_payments import router as admin_payments_router
 from handlers.admin_stats import router as admin_stats_router
 from handlers.checkers import router as checkers_router
@@ -42,6 +43,7 @@ def setup_routers() -> Router:
     root.include_router(admin_game21_router)
     root.include_router(admin_checkers_router)
     root.include_router(admin_kmb_router)
+    root.include_router(admin_levels_router)
     root.include_router(admin_stats_router)
     root.include_router(admin_router)
     return root

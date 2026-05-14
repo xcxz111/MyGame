@@ -9,8 +9,8 @@ def topup_amount_keyboard(language_code: str) -> InlineKeyboardMarkup:
     lang = language_code
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -26,6 +26,6 @@ def topup_order_keyboard(order_id: str, language_code: str) -> InlineKeyboardMar
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()

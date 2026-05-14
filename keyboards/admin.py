@@ -17,8 +17,8 @@ def admin_menu_keyboard(language_code: str) -> InlineKeyboardMarkup:
     builder.row(InlineKeyboardButton(text=t("admin_btn_stats", lang), callback_data="admin:stats"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_bot_settings", lang), callback_data="admin:settings"))
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -47,8 +47,8 @@ def admin_games_keyboard(language_code: str) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -60,12 +60,13 @@ def admin_bot_settings_keyboard(language_code: str) -> InlineKeyboardMarkup:
 
     builder.row(InlineKeyboardButton(text=t("admin_btn_payments", lang), callback_data="admin:settings:payments"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_fees", lang), callback_data="admin:settings:fees"))
+    builder.row(InlineKeyboardButton(text=t("admin_btn_levels", lang), callback_data="admin:settings:levels"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_chats", lang), callback_data="admin:settings:chats"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_forbidden_words", lang), callback_data="admin:settings:words"))
     builder.row(InlineKeyboardButton(text=t("admin_btn_admins", lang), callback_data="admin:settings:admins"))
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -87,8 +88,8 @@ def admin_game21_fees_keyboard(language_code: str) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings:fees"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings:fees", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -135,7 +136,7 @@ def admin_fees_keyboard(language_code: str) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()

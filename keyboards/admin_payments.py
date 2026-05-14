@@ -49,8 +49,8 @@ def payments_list_keyboard(
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -108,8 +108,8 @@ def account_detail_keyboard(
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings:payments"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings:payments", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 

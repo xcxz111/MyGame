@@ -79,8 +79,8 @@ def _main_kb(lang: str) -> InlineKeyboardMarkup:
     b.row(InlineKeyboardButton(text=t("admin_21_btn_enable", lang), callback_data="admin:21:enable"))
     b.row(InlineKeyboardButton(text=t("admin_21_btn_rules", lang), callback_data="admin:21:rules"))
     b.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return b.as_markup()
 
@@ -109,8 +109,8 @@ def _enable_kb(
             )
         )
     b.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:21"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:21", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return b.as_markup()
 
@@ -130,8 +130,8 @@ def _rules_kb(lang: str) -> InlineKeyboardMarkup:
         )
     )
     b.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:21"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:21", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return b.as_markup()
 

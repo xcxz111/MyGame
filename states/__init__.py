@@ -1,5 +1,6 @@
 from states.admin_chats import AdminChatsState
 from states.admin_games import AdminCreateGameState
+from states.admin_levels import AdminLevelState
 from states.admin_payments import (
     CheckersFeeState,
     KmbFeeState,
@@ -35,6 +36,7 @@ __all__ = [
     "WithdrawState",
     "AdminChatsState",
     "AdminCreateGameState",
+    "AdminLevelState",
     "KmbState",
     "KmbAdminRulesState",
 ]

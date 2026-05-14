@@ -74,8 +74,8 @@ def _kb(lang: str) -> InlineKeyboardMarkup:
     )
     b.row(InlineKeyboardButton(text=t("admin_checkers_btn_rules", lang), callback_data="admin:checkers:rules"))
     b.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return b.as_markup()
 
@@ -89,8 +89,8 @@ def _enable_kb(lang: str, chats: list[tuple[int, str, bool]]) -> InlineKeyboardM
         ).format(title=title[:28])
         b.row(InlineKeyboardButton(text=label, callback_data=f"admin:checkers:chat:{cid}"))
     b.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:checkers"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:checkers", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return b.as_markup()
 
@@ -115,8 +115,8 @@ def _rules_kb(lang: str) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     b.row(InlineKeyboardButton(text=t("admin_checkers_btn_rules", lang), callback_data="admin:checkers:rules:edit"))
     b.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:checkers"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:checkers", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return b.as_markup()
 

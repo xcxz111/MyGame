@@ -12,8 +12,8 @@ def checkers_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:checkers:confirm:no"),
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:checkers"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:checkers", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -25,8 +25,8 @@ def checkers_chat_pick_keyboard(lang: str, chats: list[tuple[int, str]]) -> Inli
             InlineKeyboardButton(text=title[:64], callback_data=f"menu:checkers:chat:{cid}")
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -41,8 +41,8 @@ def checkers_busy_keyboard(lang: str, *, show_cancel_search: bool = False) -> In
             )
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -50,7 +50,7 @@ def checkers_busy_keyboard(lang: str, *, show_cancel_search: bool = False) -> In
 def checkers_main_keyboard(lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main")]
+            [InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary")]
         ]
     )
 
@@ -62,6 +62,7 @@ def checkers_topic_pick_keyboard(
     topics: list[tuple[int, str]],
     busy: set[int | None],
     include_general: bool = True,
+    back_callback_data: str = "menu:checkers",
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     if include_general:
@@ -81,8 +82,8 @@ def checkers_topic_pick_keyboard(
             )
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:checkers"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data=back_callback_data, style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 

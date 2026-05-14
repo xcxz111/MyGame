@@ -21,6 +21,7 @@ from database.repositories import app_chat_allowed_topics as allowed_topics_repo
 from database.repositories import app_chats as app_chats_repo
 from database.repositories import checkers as checkers_repo
 from database.repositories import forum_topics as forum_topics_repo
+from database.repositories import user_levels as user_levels_repo
 from database.repositories import users as users_repo
 from keyboards.checkers import (
     board_keyboard,
@@ -58,6 +59,7 @@ from services.games.forum_thread import (
     thread_kw,
     unpin_chat_message_in_forum,
 )
+from services.user_levels import ensure_level_tag
 from states.checkers import CheckersState
 
 router = Router(name="checkers")
@@ -378,6 +380,7 @@ async def _present_checkers_topics(
     session: AsyncSession,
     lang: str,
     cid: int,
+    back_callback_data: str = "menu:checkers",
 ) -> str:
     allowed = await allowed_topics_repo.effective_allowed_public_threads(session, cid)
     if allowed == frozenset():
@@ -398,7 +401,12 @@ async def _present_checkers_topics(
             await message.edit_text(
                 t("checkers_choose_topic", lang),
                 reply_markup=checkers_topic_pick_keyboard(
-                    lang, chat_id=cid, topics=topics, busy=busy, include_general=include_general
+                    lang,
+                    chat_id=cid,
+                    topics=topics,
+                    busy=busy,
+                    include_general=include_general,
+                    back_callback_data=back_callback_data,
                 ),
             )
         except TelegramBadRequest as exc:
@@ -528,6 +536,7 @@ async def on_checkers_menu(
             session=session,
             lang=lang,
             cid=chats[0][0],
+            back_callback_data="menu:main",
         )
         if res == "no_chat":
             await callback.answer(t("game21_pvp_no_available_chat", lang), show_alert=True)
@@ -1142,6 +1151,19 @@ async def _finish_checkers(
     sm = get_session_maker()
     async with sm() as session:
         await add_balance(session, winner_id, payout, method=METHOD_CHECKERS_WIN)
+        new_level = await user_levels_repo.add_winning_bet_progress(
+            session,
+            user_id=winner_id,
+            bet_amount=bet,
+            source="game:checkers",
+        )
+        if new_level is not None:
+            await ensure_level_tag(
+                bot,
+                chat_id=int(st["chat_id"]),
+                user_id=winner_id,
+                level=new_level,
+            )
         for uid in (int(st.get("player1_id") or 0), int(st.get("player2_id") or 0)):
             await users_repo.award_referral_percent(
                 session,

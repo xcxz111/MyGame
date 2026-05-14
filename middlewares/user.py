@@ -3,9 +3,12 @@
 from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject
+from aiogram.types import CallbackQuery, Message, TelegramObject
 
+from database.models.user import UserStatus
 from database.repositories import users as users_repo
+from permissions import is_admin
+from settings import get_settings
 
 
 class UserMiddleware(BaseMiddleware):
@@ -31,4 +34,11 @@ class UserMiddleware(BaseMiddleware):
             name=full_name,
         )
         data["user"] = user
+        if user.status == UserStatus.BANNED and not is_admin(user, get_settings()):
+            if isinstance(event, CallbackQuery):
+                await event.answer("⛔ Вы заблокированы.", show_alert=True)
+                return None
+            if isinstance(event, Message):
+                await event.answer("⛔ Вы заблокированы.")
+                return None
         return await handler(event, data)

@@ -42,6 +42,7 @@ from database.models import (  # noqa: F401  — регистрирует мод
     SlotSpin,
     Throw,
     User,
+    UserLevel,
     Withdrawal,
 )
 
@@ -146,12 +147,64 @@ def _ensure_users_referrer_id(connection) -> None:
     if "users" not in insp.get_table_names():
         return
     cols = {c["name"] for c in insp.get_columns("users")}
-    if "referrer_id" not in cols:
+    for col, ddl in (
+        (
+            "level",
+            "SMALLINT NOT NULL DEFAULT 1 COMMENT 'Текущий уровень пользователя'",
+        ),
+        (
+            "level_win_bet_sum",
+            "DECIMAL(14,2) NOT NULL DEFAULT 0.00 COMMENT 'Сумма выигранных ставок для прогресса уровня'",
+        ),
+        (
+            "referrer_id",
+            "BIGINT NULL COMMENT 'Telegram user_id пригласившего пользователя'",
+        ),
+        (
+            "withdraw_percent",
+            "DECIMAL(5,2) NULL COMMENT 'Персональная скидка к комиссии вывода, NULL = без скидки'",
+        ),
+        (
+            "referral_percent",
+            "DECIMAL(5,2) NULL COMMENT 'Персональная надбавка к реферальному проценту, NULL = без надбавки'",
+        ),
+    ):
+        if col not in cols:
+            connection.execute(text(f"ALTER TABLE `users` ADD COLUMN `{col}` {ddl}"))
+
+
+def _seed_user_levels(connection) -> None:
+    insp = inspect(connection)
+    if "user_levels" not in insp.get_table_names():
+        return
+    rows = [
+        (1, "Начальный уровень", "0.00", "0.00", "0.00", "0.00"),
+        (2, "Уровень 2", "100.00", "10.00", "0.00", "0.00"),
+        (3, "Уровень 3", "1000.00", "30.00", "1.00", "0.00"),
+        (4, "Уровень 4", "5000.00", "50.00", "0.00", "0.00"),
+        (5, "Уровень 5", "10000.00", "100.00", "1.00", "1.00"),
+        (6, "Уровень 6", "25000.00", "0.00", "0.00", "0.00"),
+        (7, "Уровень 7", "50000.00", "0.00", "0.00", "0.00"),
+        (8, "Уровень 8", "100000.00", "0.00", "0.00", "0.00"),
+        (9, "Уровень 9", "250000.00", "0.00", "0.00", "0.00"),
+        (10, "Уровень 10", "500000.00", "0.00", "0.00", "0.00"),
+    ]
+    for level, title, required, reward, withdraw_discount, referral_bonus in rows:
         connection.execute(
             text(
-                "ALTER TABLE `users` ADD COLUMN `referrer_id` BIGINT NULL "
-                "COMMENT 'Telegram user_id пригласившего пользователя'"
-            )
+                "INSERT IGNORE INTO `user_levels` "
+                "(`level`, `title`, `required_win_bet_sum`, `balance_reward`, "
+                "`withdraw_discount_percent`, `referral_bonus_percent`, `active`) "
+                "VALUES (:level, :title, :required, :reward, :withdraw_discount, :referral_bonus, 1)"
+            ),
+            {
+                "level": level,
+                "title": title,
+                "required": required,
+                "reward": reward,
+                "withdraw_discount": withdraw_discount,
+                "referral_bonus": referral_bonus,
+            },
         )
 
 
@@ -257,6 +310,7 @@ async def init_db() -> None:
         await conn.run_sync(Base.metadata.create_all)
         await conn.run_sync(_ensure_fees_columns)
         await conn.run_sync(_ensure_users_referrer_id)
+        await conn.run_sync(_seed_user_levels)
         await conn.run_sync(_ensure_checkers_columns)
         await conn.run_sync(_ensure_kmb_columns)
         await conn.run_sync(_ensure_app_chats_button_titles)

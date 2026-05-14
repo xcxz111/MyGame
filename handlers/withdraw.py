@@ -13,8 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.models import User
 from database.models.payment_log import PaymentLogMethod
 from database.models.withdrawal import WithdrawalStatus
-from database.repositories import fees as fees_repo
 from database.repositories import payment_logs as payment_logs_repo
+from database.repositories import users as users_repo
 from database.repositories import withdrawals as withdrawals_repo
 from handlers.cabinet import render_cabinet, send_cabinet
 from keyboards.withdraw import (
@@ -109,7 +109,7 @@ async def on_menu_withdraw(
         await render_cabinet(callback, session, user, bot)
         return
 
-    fee_percent = await fees_repo.get_withdraw_percent(session)
+    fee_percent = await users_repo.effective_withdraw_percent(session, user)
     await state.set_state(WithdrawState.waiting_amount)
     await callback.message.edit_text(
         t("withdraw_enter_amount", lang).format(
@@ -175,7 +175,7 @@ async def on_withdraw_blik(
 
     data = await state.get_data()
     amount = Decimal(data["amount"])
-    fee_percent = await fees_repo.get_withdraw_percent(session)
+    fee_percent = await users_repo.effective_withdraw_percent(session, user)
     fee_amount, payout = _calc_payout(amount, fee_percent)
 
     await state.update_data(

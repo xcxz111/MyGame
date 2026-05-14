@@ -18,7 +18,7 @@ def language_keyboard(
         builder.add(InlineKeyboardButton(text=label, callback_data=f"lang:{code}"))
     if with_back_to_main:
         builder.add(
-            InlineKeyboardButton(text=t("btn_main", nav_lang), callback_data="menu:main")
+            InlineKeyboardButton(text=t("btn_main", nav_lang), callback_data="menu:main", style="primary")
         )
     builder.adjust(1)
     return builder.as_markup()

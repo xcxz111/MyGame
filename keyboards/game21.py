@@ -26,8 +26,8 @@ def play21_menu_keyboard(lang: str, *, bot_on: bool, pvp_on: bool) -> InlineKeyb
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -42,8 +42,8 @@ def play21_busy_keyboard(lang: str, *, show_cancel_search: bool = False) -> Inli
             )
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -51,8 +51,8 @@ def play21_busy_keyboard(lang: str, *, show_cancel_search: bool = False) -> Inli
 def play21_rules_back_keyboard(lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -64,8 +64,8 @@ def play21_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:play21bot:confirm:no"),
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -77,8 +77,8 @@ def play21_pvp_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text=t("game21_btn_no", lang), callback_data="menu:play21bot:pvp:confirm:no"),
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -93,8 +93,8 @@ def play21_pvp_chat_pick_keyboard(lang: str, chats: list[tuple[int, str]]) -> In
             )
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -130,8 +130,8 @@ def play21_pvp_topic_pick_keyboard(
             )
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot:pvp"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:play21bot:pvp", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 

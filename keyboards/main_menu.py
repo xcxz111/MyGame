@@ -36,7 +36,7 @@ def main_menu_chat_link_buttons(
         label = (c.button_title_for(lang) or fallback).strip() or fallback
         if len(label) > 64:
             label = label[:61] + "…"
-        out.append(InlineKeyboardButton(text=label, url=url))
+        out.append(InlineKeyboardButton(text=label, url=url, style="success"))
     return out
 
 
@@ -74,6 +74,6 @@ def main_menu_keyboard(
     if admin_telegram_id is not None and int(user_id) == int(admin_telegram_id):
         builder.add(InlineKeyboardButton(text=t("btn_admin", lang), callback_data="menu:admin"))
 
-    builder.add(InlineKeyboardButton(text=t("btn_lang", lang), callback_data="menu:lang"))
+    builder.add(InlineKeyboardButton(text=t("btn_lang", lang), callback_data="menu:lang", style="primary"))
     builder.adjust(1)
     return builder.as_markup()

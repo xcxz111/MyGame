@@ -9,7 +9,6 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
-from database.repositories import fees as fees_repo
 from database.repositories import withdrawals as withdrawals_repo
 from database.repositories import users as users_repo
 from keyboards import cabinet_menu_keyboard
@@ -37,8 +36,8 @@ async def _referral_link(bot: Bot, user_id: int) -> str:
 def _back_keyboard(lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:cabinet"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:cabinet", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -93,7 +92,7 @@ async def on_referral_program(
 ) -> None:
     lang = user.language_code or get_lang(callback.from_user.language_code)
     link = await _referral_link(bot, user.user_id)
-    percent = await fees_repo.get_referral_percent(session)
+    percent = await users_repo.effective_referral_percent(session, user)
     referrals = await users_repo.list_referrals_with_profit(session, user.user_id)
     if referrals:
         lines = []

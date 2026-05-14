@@ -30,8 +30,8 @@ def admin_chats_keyboard(language_code: str) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -51,9 +51,11 @@ def admin_chats_delete_list_keyboard(
         )
     builder.row(
         InlineKeyboardButton(
-            text=t("btn_back", lang), callback_data="admin:settings:chats"
+            text=t("btn_back", lang),
+            callback_data="admin:settings:chats",
+            style="primary",
         ),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -92,9 +94,11 @@ def admin_chats_topics_chat_list_keyboard(
         )
     builder.row(
         InlineKeyboardButton(
-            text=t("btn_back", lang), callback_data="admin:settings:chats"
+            text=t("btn_back", lang),
+            callback_data="admin:settings:chats",
+            style="primary",
         ),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -137,9 +141,11 @@ def admin_chats_topic_whitelist_keyboard(
         )
     builder.row(
         InlineKeyboardButton(
-            text=t("btn_back", lang), callback_data=back_callback_data
+            text=t("btn_back", lang),
+            callback_data=back_callback_data,
+            style="primary",
         ),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -149,7 +155,7 @@ def admin_chats_fsm_nav_keyboard(language_code: str) -> InlineKeyboardMarkup:
     lang = language_code
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings:chats"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:settings:chats", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()

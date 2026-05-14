@@ -14,6 +14,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from database.repositories import game21_history as g21_hist
+from database.repositories import user_levels as user_levels_repo
 from database.repositories import users as users_repo
 from locales.texts import t
 from services.game21.balance import (
@@ -31,6 +32,7 @@ from services.game21.pvp_state import (
     store_live,
 )
 from services.games.forum_thread import edit_message_text_in_forum, thread_kw, unpin_chat_message_in_forum
+from services.user_levels import ensure_level_tag
 
 logger = logging.getLogger(__name__)
 
@@ -234,6 +236,19 @@ async def _finish_pvp_game_locked(
                 await add_balance(session, p2, bet, method=METHOD_PVP_REFUND)
             elif winner_id in (p1, p2):
                 await add_balance(session, int(winner_id), payout, method=METHOD_PVP_WIN)
+                new_level = await user_levels_repo.add_winning_bet_progress(
+                    session,
+                    user_id=int(winner_id),
+                    bet_amount=bet,
+                    source="game:21:pvp",
+                )
+                if new_level is not None:
+                    await ensure_level_tag(
+                        bot,
+                        chat_id=chat_id,
+                        user_id=int(winner_id),
+                        level=new_level,
+                    )
             player_commission_base = (commission_amount / Decimal("2")).quantize(
                 Decimal("0.01")
             )

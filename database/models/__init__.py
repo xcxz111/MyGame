@@ -25,6 +25,7 @@ from database.models.prize import Prize
 from database.models.referral import ReferralReward
 from database.models.slot import SlotSettings, SlotSpin
 from database.models.throw import Throw
+from database.models.user_level import UserLevel
 from database.models.user import User, UserRole, UserStatus
 from database.models.withdrawal import Withdrawal, WithdrawalStatus
 
@@ -32,6 +33,7 @@ __all__ = [
     "User",
     "UserRole",
     "UserStatus",
+    "UserLevel",
     "MBankAccount",
     "MBankOrder",
     "MBankOrderStatus",

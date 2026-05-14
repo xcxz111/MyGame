@@ -18,6 +18,7 @@ from database.engine import get_session_maker
 from database.repositories import app_chats as app_chats_repo
 from database.repositories import game21_history as g21_hist
 from database.repositories import game21_settings as g21_repo
+from database.repositories import user_levels as user_levels_repo
 from database.repositories import users as users_repo
 from locales.texts import get_lang, t
 from services.game21.balance import (
@@ -396,6 +397,12 @@ async def _finish_bot_win(
     player_total = int(st.get("player_total") or 0)
     bot_total = int(st.get("bot_total") or 0)
     await add_balance(session, uid, payout, method=METHOD_BOT_WIN)
+    await user_levels_repo.add_winning_bet_progress(
+        session,
+        user_id=uid,
+        bet_amount=bet,
+        source="game:21:bot",
+    )
     await _close_game21_bot_session_gb(session, st, uid, "win")
     await session.commit()
     st["finished"] = True

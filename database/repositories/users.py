@@ -13,10 +13,27 @@ from database.models.referral import ReferralReward
 from database.models.user import User, UserRole, UserStatus
 from database.repositories import fees as fees_repo
 from database.repositories import payment_logs as payment_logs_repo
+from database.repositories import user_levels as user_levels_repo
 
 
 async def get_user(session: AsyncSession, user_id: int) -> User | None:
     return await session.get(User, user_id)
+
+
+async def find_user_by_id_or_username(session: AsyncSession, query: str) -> User | None:
+    value = query.strip()
+    if not value:
+        return None
+    if value.startswith("@"):
+        value = value[1:]
+    if value.isdigit():
+        user = await session.get(User, int(value))
+        if user is not None:
+            return user
+    result = await session.execute(
+        select(User).where(func.lower(User.user_name) == value.lower()).limit(1)
+    )
+    return result.scalar_one_or_none()
 
 
 async def upsert_user(
@@ -62,6 +79,59 @@ async def set_status(session: AsyncSession, user_id: int, status: int) -> None:
     if user is not None:
         user.status = status
         await session.flush()
+
+
+async def adjust_balance(
+    session: AsyncSession, user_id: int, amount: Decimal, *, method: str
+) -> Decimal | None:
+    user = await session.get(User, int(user_id))
+    if user is None:
+        return None
+    user.balance = (user.balance or Decimal("0")) + amount
+    await session.flush()
+    await payment_logs_repo.log(
+        session,
+        user_id=int(user.user_id),
+        method=method,
+        amount=amount,
+        balance_after=user.balance,
+    )
+    return user.balance
+
+
+async def set_withdraw_percent(
+    session: AsyncSession, user_id: int, percent: Decimal | None
+) -> None:
+    user = await session.get(User, int(user_id))
+    if user is not None:
+        user.withdraw_percent = percent
+        await session.flush()
+
+
+async def set_referral_percent(
+    session: AsyncSession, user_id: int, percent: Decimal | None
+) -> None:
+    user = await session.get(User, int(user_id))
+    if user is not None:
+        user.referral_percent = percent
+        await session.flush()
+
+
+async def effective_withdraw_percent(session: AsyncSession, user: User) -> Decimal:
+    global_percent = await fees_repo.get_withdraw_percent(session)
+    level_discount, _ = await user_levels_repo.get_bonus_totals(
+        session, int(user.level or 1)
+    )
+    discount = (user.withdraw_percent or Decimal("0.00")) + level_discount
+    effective = global_percent - discount
+    return max(effective, Decimal("0.00")).quantize(Decimal("0.01"))
+
+
+async def effective_referral_percent(session: AsyncSession, user: User) -> Decimal:
+    global_percent = await fees_repo.get_referral_percent(session)
+    _, level_bonus = await user_levels_repo.get_bonus_totals(session, int(user.level or 1))
+    bonus = (user.referral_percent or Decimal("0.00")) + level_bonus
+    return (global_percent + bonus).quantize(Decimal("0.01"))
 
 
 async def set_role(session: AsyncSession, user_id: int, role: str) -> None:
@@ -154,7 +224,13 @@ async def award_referral_percent(
 ) -> Decimal:
     if base_amount <= 0:
         return Decimal("0.00")
-    percent = await fees_repo.get_referral_percent(session)
+    referral = await session.get(User, int(referral_id))
+    if referral is None or referral.referrer_id is None:
+        return Decimal("0.00")
+    referrer = await session.get(User, int(referral.referrer_id))
+    if referrer is None:
+        return Decimal("0.00")
+    percent = await effective_referral_percent(session, referrer)
     if percent <= 0:
         return Decimal("0.00")
     amount = (base_amount * percent / Decimal("100")).quantize(Decimal("0.01"))

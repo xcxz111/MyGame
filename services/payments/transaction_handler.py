@@ -256,6 +256,7 @@ class BankTransactionHandler:
                     InlineKeyboardButton(
                         text=t("btn_main", user_lang),
                         callback_data="menu:main",
+                        style="primary",
                     )
                 ]]
             )

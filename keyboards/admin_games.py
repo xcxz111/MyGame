@@ -25,8 +25,8 @@ def admin_game_chat_pick_keyboard(
             )
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:games"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:games", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -63,8 +63,8 @@ def admin_game_forum_topic_keyboard(
         ),
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:games"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:games", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -78,7 +78,7 @@ def admin_game_cancel_keyboard(language_code: str) -> InlineKeyboardMarkup:
             text=t("admin_btn_cancel_create", lang),
             callback_data="admin:games:create:cancel",
         ),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -121,8 +121,8 @@ def admin_games_list_keyboard(
             )
         )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data=back_to),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data=back_to, style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -134,7 +134,7 @@ def admin_game_detail_keyboard(
     lang = language_code
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data=back_to),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data=back_to, style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()

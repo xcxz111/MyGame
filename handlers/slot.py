@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.models import User
 from database.repositories import fees as fees_repo
 from database.repositories import slot as slot_repo
+from database.repositories import user_levels as user_levels_repo
 from database.repositories import users as users_repo
 from locales.texts import get_lang, t
 from permissions import is_admin
@@ -80,8 +81,8 @@ def _admin_slot_keyboard(lang: str, *, enabled: bool) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -198,6 +199,12 @@ async def on_slot_spin(
         payout = payout_for(bet, multiplier, commission)
         if payout > 0:
             await add_balance(session, uid, payout, method=METHOD_SLOT_WIN)
+            await user_levels_repo.add_winning_bet_progress(
+                session,
+                user_id=uid,
+                bet_amount=bet,
+                source="game:slot",
+            )
         await slot_repo.add_spin(
             session,
             user_id=uid,

@@ -24,6 +24,7 @@ class PaymentLogMethod:
     GAME_ENTRY_REFUND = "game_entry_refund"  # возврат взноса (отмена игры / выход до старта)
     GAME_PRIZE = "game_prize"     # выигрыш по месту (method + place в отдельном поле не кладём — см. amount)
     REFERRAL = "referral"          # начисление по реферальной программе
+    LEVEL_REWARD = "level_reward"  # награда за получение уровня
     # для игр сюда будем класть код/название: 'game:21', 'game:slot', и т.п.
 
 

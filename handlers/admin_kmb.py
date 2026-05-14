@@ -70,8 +70,8 @@ def _kb(lang: str) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:admin", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 
@@ -85,8 +85,8 @@ def _rules_kb(lang: str) -> InlineKeyboardMarkup:
         )
     )
     builder.row(
-        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:kmb"),
-        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main"),
+        InlineKeyboardButton(text=t("btn_back", lang), callback_data="admin:kmb", style="primary"),
+        InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )
     return builder.as_markup()
 

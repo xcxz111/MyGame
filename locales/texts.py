@@ -91,7 +91,7 @@ TEXTS: dict[str, dict[str, str]] = {
             "🤝 <b>Реферальная программа</b>\n\n"
             "Ваша ссылка:\n<code>{link}</code>\n\n"
             "Условия: приглашайте игроков по своей ссылке и получайте "
-            "<b>{percent}%</b> от реферальной базы, которую задаёт администратор.\n\n"
+            "<b>{percent}%</b> от каждой выйгранной ставки вашего реферала\n\n"
             "<b>Ваши рефералы:</b>\n{referrals}"
         ),
         "referral_empty": "Пока нет рефералов.",
@@ -182,6 +182,57 @@ TEXTS: dict[str, dict[str, str]] = {
             "С балансом: {with_balance}\n"
             "Общий баланс: {balance_sum} PLN"
         ),
+        "admin_user_search_prompt": "👥 Введите ID пользователя или username:",
+        "admin_user_not_found": "❌ Пользователь не найден. Введите ID или username ещё раз.",
+        "admin_user_card": (
+            "👤 <b>{label}</b>\n\n"
+            "ID: <code>{user_id}</code>\n"
+            "Username: {username}\n"
+            "Статус: {status}\n"
+            "Баланс: <b>{balance} PLN</b>\n"
+            "Уровень: <b>{level}</b>\n"
+            "Выигранных ставок для уровня: {level_progress} PLN\n"
+            "Бонус уровня: вывод −{level_withdraw_discount}%, рефералы +{level_referral_bonus}%\n"
+            "Язык: {language}\n"
+            "Пригласил: {referrer}\n\n"
+            "Комиссия вывода: <b>{withdraw_percent}%</b> ({withdraw_source})\n"
+            "Реферальный %: <b>{referral_percent}%</b> ({referral_source})\n\n"
+            "Рефералов: {referrals_count}\n"
+            "Прибыль от рефералов: {referrals_profit} PLN"
+        ),
+        "admin_user_status_active": "🟢 активен",
+        "admin_user_status_banned": "🔴 забанен",
+        "admin_user_percent_global": "общая {percent}%",
+        "admin_user_percent_personal": "персональная {percent}%",
+        "admin_user_withdraw_discount": "общая {global_percent}% − скидка {discount}%",
+        "admin_user_referral_bonus": "общая {global_percent}% + надбавка {bonus}%",
+        "admin_user_percent_reset": "без персональной настройки",
+        "admin_user_btn_topup": "💳 Пополнить баланс",
+        "admin_user_btn_withdraw_percent": "💸 Изменить комиссию на вывод",
+        "admin_user_btn_referral_percent": "🤝 Изменить реферальный %",
+        "admin_user_btn_ban": "🚫 Забанить",
+        "admin_user_btn_unban": "✅ Разбанить",
+        "admin_user_btn_find_other": "🔎 Найти другого пользователя",
+        "admin_user_topup_prompt": "Введите сумму пополнения для {user} / <code>{user_id}</code>:",
+        "admin_user_withdraw_prompt": (
+            "Введите скидку к комиссии вывода для {user} / <code>{user_id}</code>.\n\n"
+            "Например: если общая комиссия 10%, а вы введёте <code>1</code>, "
+            "итоговая комиссия будет 9%.\n\n"
+            "Отправьте процент от 0 до 100 или <code>-</code>, чтобы убрать персональную скидку."
+        ),
+        "admin_user_referral_prompt": (
+            "Введите надбавку к реферальному проценту для {user} / <code>{user_id}</code>.\n\n"
+            "Например: если общий реферальный процент 1%, а вы введёте <code>1</code>, "
+            "итоговый процент будет 2%.\n\n"
+            "Отправьте процент от 0 до 100 или <code>-</code>, чтобы убрать персональную надбавку."
+        ),
+        "admin_user_amount_invalid": "❌ Введите положительную сумму.",
+        "admin_user_percent_invalid": "❌ Введите процент от 0 до 100 или <code>-</code> для сброса.",
+        "admin_user_topup_done": "✅ Баланс пополнен на <b>{amount} PLN</b>.",
+        "admin_user_withdraw_done": "✅ Скидка к комиссии вывода обновлена: <b>{percent}</b>.",
+        "admin_user_referral_done": "✅ Надбавка к реферальному проценту обновлена: <b>{percent}</b>.",
+        "admin_user_banned": "Пользователь забанен.",
+        "admin_user_unbanned": "Пользователь разбанен.",
         "admin_btn_bot_settings": "⚙️ Настройки бота",
         "admin_games_title": "🎯 <b>Игры</b>",
         "admin_btn_create_game": "➕ Создать игру",
@@ -191,6 +242,36 @@ TEXTS: dict[str, dict[str, str]] = {
         "admin_settings_title": "⚙️ Настройки бота",
         "admin_btn_payments": "💳 Настройка платежей",
         "admin_btn_fees": "💸 Настройка комиссий",
+        "admin_btn_levels": "⭐ Настройка уровней",
+        "admin_levels_title": "⭐ <b>Настройка уровней</b>\n\nВыберите уровень для редактирования:",
+        "admin_levels_detail": (
+            "⭐ <b>Уровень {level}</b>\n\n"
+            "Название: <b>{title}</b>\n"
+            "Статус: {status}\n\n"
+            "Нужно выигранных ставок: <b>{required} PLN</b>\n"
+            "Награда на баланс: <b>{reward} PLN</b>\n"
+            "Скидка к комиссии вывода: <b>{withdraw}%</b>\n"
+            "Надбавка к реферальному %: <b>{referral}%</b>"
+        ),
+        "admin_levels_status_on": "🟢 включён",
+        "admin_levels_status_off": "⚪ выключен",
+        "admin_levels_not_found": "❌ Уровень не найден.",
+        "admin_levels_saved": "✅ Сохранено.",
+        "admin_levels_btn_title": "Название",
+        "admin_levels_btn_required": "Условие получения",
+        "admin_levels_btn_reward": "Награда на баланс",
+        "admin_levels_btn_withdraw": "Скидка вывода",
+        "admin_levels_btn_referral": "Бонус рефералов",
+        "admin_levels_btn_enable": "Включить",
+        "admin_levels_btn_disable": "Выключить",
+        "admin_levels_prompt_title": "Введите название для уровня {level}:",
+        "admin_levels_prompt_required": "Введите сумму выигранных ставок для получения уровня {level}:",
+        "admin_levels_prompt_reward": "Введите награду на баланс за уровень {level}:",
+        "admin_levels_prompt_withdraw": "Введите скидку к комиссии вывода за уровень {level} (0-100):",
+        "admin_levels_prompt_referral": "Введите надбавку к реферальному проценту за уровень {level} (0-100):",
+        "admin_levels_invalid_text": "❌ Текст не может быть пустым.",
+        "admin_levels_invalid_amount": "❌ Введите положительное число или 0.",
+        "admin_levels_invalid_percent": "❌ Введите процент от 0 до 100.",
         "admin_btn_withdraw_fee": "💸 Комиссия вывода",
         "admin_btn_slot_fee": "🎰 Комиссия Слота",
         "admin_btn_checkers_fee": "⚪️ Комиссия Шашек ⚫️",
