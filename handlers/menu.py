@@ -40,7 +40,7 @@ async def _send_main_menu_message(
     show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await message.answer(
-        build_welcome_text(lang, user.user_id, user.balance),
+        build_welcome_text(lang, user.user_id, user.balance, user.level or 0),
         reply_markup=main_menu_keyboard(
             lang,
             user.user_id,
@@ -99,7 +99,7 @@ async def on_menu_main(
         pass
     await callback.bot.send_message(
         chat_id=callback.from_user.id,
-        text=build_welcome_text(lang, user.user_id, user.balance),
+        text=build_welcome_text(lang, user.user_id, user.balance, user.level or 0),
         reply_markup=main_menu_keyboard(
             lang,
             user.user_id,

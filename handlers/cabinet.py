@@ -2,8 +2,8 @@
 
 from html import escape
 
-from aiogram import F, Router
-from aiogram import Bot
+from aiogram import Bot, F, Router
+from aiogram.enums import ChatType, ParseMode
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,6 +29,11 @@ def _fmt_balance(balance) -> str:
         return str(balance)
 
 
+def _fmt_percent_bonus(value) -> str:
+    """Бонус в процентах с «+» (например +1%)."""
+    return f"+{_fmt_balance(value)}%"
+
+
 async def _referral_link(bot: Bot, user_id: int) -> str:
     me = await bot.get_me()
     return f"https://t.me/{me.username}?start=ref_{user_id}"
@@ -43,10 +48,46 @@ def _back_keyboard(lang: str) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
+async def build_levels_info_text(
+    session: AsyncSession, user: User, lang: str
+) -> str:
+    """Текст экрана «Информация уровней» для пользователя."""
+    await session.refresh(user)
+    current = int(user.level or 0)
+    levels = [
+        row
+        for row in await user_levels_repo.list_levels(session)
+        if int(row.active or 0) == 1
+    ]
+    if not levels:
+        return f"{t('cabinet_levels_info_title', lang)}\n\n{t('cabinet_levels_info_empty', lang)}"
+
+    blocks: list[str] = [t("cabinet_levels_info_title", lang), ""]
+    for row in levels:
+        lvl = int(row.level)
+        mark = t("cabinet_levels_info_current_mark", lang) if lvl == current else ""
+        raw_title = (row.title or "").strip()
+        title_suffix = f" — {escape(raw_title)}" if raw_title else ""
+        blocks.append(
+            t("cabinet_levels_info_block", lang).format(
+                level=lvl,
+                current=mark,
+                title=title_suffix,
+                required=_fmt_balance(row.required_win_bet_sum),
+                reward=_fmt_balance(row.balance_reward),
+                withdraw=_fmt_percent_bonus(row.withdraw_discount_percent),
+                referral=_fmt_percent_bonus(row.referral_bonus_percent),
+            )
+        )
+        blocks.append("")
+    return "\n".join(blocks).rstrip()
+
+
 async def build_cabinet_view(
     session: AsyncSession, user: User, lang: str, bot: Bot
 ) -> tuple[str, InlineKeyboardMarkup]:
     """Возвращает (текст, клавиатуру) для экрана личного кабинета."""
+    await session.refresh(user)
     pending = await withdrawals_repo.get_pending_for_user(session, user.user_id)
     link = await _referral_link(bot, user.user_id)
     level = int(user.level or 0)
@@ -57,14 +98,13 @@ async def build_cabinet_view(
     else:
         remaining = max((next_level.required_win_bet_sum or 0) - progress, 0)
         next_level_text = t("cabinet_next_level", lang).format(
-            level=int(next_level.level),
             amount=_fmt_balance(remaining),
         )
     text = (
         f"{t('cabinet_title', lang)}\n\n"
-        + t("cabinet_balance", lang).format(balance=_fmt_balance(user.balance))
-        + "\n"
         + t("cabinet_level", lang).format(level=level)
+        + "\n"
+        + t("cabinet_balance", lang).format(balance=_fmt_balance(user.balance))
         + "\n"
         + next_level_text
         + "\n\n"
@@ -99,6 +139,20 @@ async def on_menu_cabinet(
     callback: CallbackQuery, session: AsyncSession, user: User, bot: Bot
 ) -> None:
     await render_cabinet(callback, session, user, bot)
+    await callback.answer()
+
+
+@router.callback_query(F.data == "cabinet:levels_info", F.message.chat.type == "private")
+async def on_levels_info(
+    callback: CallbackQuery, session: AsyncSession, user: User
+) -> None:
+    lang = user.language_code or get_lang(callback.from_user.language_code)
+    text = await build_levels_info_text(session, user, lang)
+    await callback.message.edit_text(
+        text,
+        parse_mode=ParseMode.HTML,
+        reply_markup=_back_keyboard(lang),
+    )
     await callback.answer()
 
 

@@ -39,6 +39,12 @@ def cabinet_menu_keyboard(
         )
     )
     builder.row(
+        InlineKeyboardButton(
+            text=t("btn_cabinet_levels_info", lang),
+            callback_data="cabinet:levels_info",
+        )
+    )
+    builder.row(
         InlineKeyboardButton(text=t("btn_back", lang), callback_data="menu:main", style="primary"),
         InlineKeyboardButton(text=t("btn_main", lang), callback_data="menu:main", style="primary"),
     )

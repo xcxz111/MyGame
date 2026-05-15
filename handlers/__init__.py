@@ -16,6 +16,7 @@ from handlers.kmb import router as kmb_router
 from handlers.forum_topic_sync import router as forum_topic_sync_router
 from handlers.game_play import router as game_play_router
 from handlers.game_signup import router as game_signup_router
+from handlers.roulette_demo import router as roulette_demo_router
 from handlers.menu import router as menu_router
 from handlers.slot import router as slot_router
 from handlers.start import router as start_router
@@ -37,6 +38,7 @@ def setup_routers() -> Router:
     root.include_router(withdraw_router)
     root.include_router(forum_topic_sync_router)
     root.include_router(game_play_router)
+    root.include_router(roulette_demo_router)
     root.include_router(admin_games_router)
     root.include_router(admin_chats_router)
     root.include_router(admin_payments_router)

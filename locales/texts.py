@@ -15,8 +15,9 @@ TEXTS: dict[str, dict[str, str]] = {
     "ru": {
         "choose_language": "Выберите язык / Choose language:",
         "welcome_menu": "Добро пожаловать в бота для игр",
-        "welcome_user_id": "Ваш ID: {user_id}",
+        "welcome_user_id": "🆔 Ваш ID: <b>{user_id}</b>",
         "welcome_balance": "Ваш баланс: {balance} PLN",
+        "welcome_level": "Ваш Level: {level}",
         "btn_cabinet": "💼Личный кабинет💼",
         "btn_topup": "💳 Пополнить баланс",
         "topup_enter_amount": "💳 <b>Пополнение баланса</b>\n\nВведите сумму пополнения в PLN (от {min} до {max} PLN):",
@@ -86,8 +87,23 @@ TEXTS: dict[str, dict[str, str]] = {
         "cabinet_title": "💼 Личный кабинет",
         "cabinet_balance": "💰 Баланс: <b>{balance} PLN</b>",
         "cabinet_level": "⭐ Уровень: <b>{level}</b>",
-        "cabinet_next_level": "📈 До уровня {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level": (
+            "📈 До следующего уровня необходимо сделать выигрышных ставок на: <b>{amount} PLN</b>"
+        ),
         "cabinet_next_level_max": "📈 Следующий уровень: <b>максимальный уровень достигнут</b>",
+        "btn_cabinet_levels_info": "ℹ️ Информация уровней",
+        "cabinet_levels_info_title": "ℹ️ <b>Информация уровней</b>",
+        "cabinet_levels_info_empty": "Активные уровни пока не настроены.",
+        "cabinet_levels_info_block": (
+            "<b>Уровень {level}</b>{current}{title}\n\n"
+            "📋 <b>Условие:</b>\n"
+            "• Сумма выигранных ставок: <b>{required} PLN</b>\n\n"
+            "🎁 <b>Награды:</b>\n"
+            "• На баланс: <b>{reward} PLN</b>\n"
+            "• Скидка на комиссию вывода: <b>{withdraw}</b>\n"
+            "• Бонус к реферальному %: <b>{referral}</b>"
+        ),
+        "cabinet_levels_info_current_mark": " · у вас",
         "cabinet_referral_link": "🔗 Ваша реферальная ссылка:\n<code>{link}</code>",
         "btn_referral_program": "🤝 Реферальная программа",
         "referral_program_text": (
@@ -807,8 +823,9 @@ TEXTS: dict[str, dict[str, str]] = {
     "en": {
         "choose_language": "Choose language / Выберите язык:",
         "welcome_menu": "Welcome to the game bot",
-        "welcome_user_id": "Your ID: {user_id}",
+        "welcome_user_id": "🆔 Your ID: <b>{user_id}</b>",
         "welcome_balance": "Your balance: {balance} PLN",
+        "welcome_level": "Your level: {level}",
         "btn_cabinet": "Personal account",
         "btn_topup": "💳 Top up balance",
         "topup_enter_amount": "💳 <b>Top up balance</b>\n\nEnter the top-up amount in PLN (from {min} to {max} PLN):",
@@ -878,8 +895,23 @@ TEXTS: dict[str, dict[str, str]] = {
         "cabinet_title": "💼 Personal account",
         "cabinet_balance": "💰 Balance: <b>{balance} PLN</b>",
         "cabinet_level": "⭐ Level: <b>{level}</b>",
-        "cabinet_next_level": "📈 Until level {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level": (
+            "📈 To reach the next level, winning bets required: <b>{amount} PLN</b>"
+        ),
         "cabinet_next_level_max": "📈 Next level: <b>maximum level reached</b>",
+        "btn_cabinet_levels_info": "ℹ️ Level information",
+        "cabinet_levels_info_title": "ℹ️ <b>Level information</b>",
+        "cabinet_levels_info_empty": "No active levels configured yet.",
+        "cabinet_levels_info_block": (
+            "<b>Level {level}</b>{current}{title}\n\n"
+            "📋 <b>Requirement:</b>\n"
+            "• Winning bets total: <b>{required} PLN</b>\n\n"
+            "🎁 <b>Rewards:</b>\n"
+            "• Balance: <b>{reward} PLN</b>\n"
+            "• Withdrawal fee discount: <b>{withdraw}</b>\n"
+            "• Referral % bonus: <b>{referral}</b>"
+        ),
+        "cabinet_levels_info_current_mark": " · yours",
         "cabinet_referral_link": "🔗 Your referral link:\n<code>{link}</code>",
         "btn_referral_program": "🤝 Referral program",
         "btn_return_main": "back to main menu",
@@ -1546,8 +1578,9 @@ TEXTS: dict[str, dict[str, str]] = {
     "uk": {
         "choose_language": "Оберіть мову / Choose language:",
         "welcome_menu": "Ласкаво просимо в бота для ігор",
-        "welcome_user_id": "Ваш ID: {user_id}",
+        "welcome_user_id": "🆔 Ваш ID: <b>{user_id}</b>",
         "welcome_balance": "Ваш баланс: {balance} PLN",
+        "welcome_level": "Ваш Level: {level}",
         "btn_cabinet": "Особистий кабінет",
         "btn_topup": "💳 Поповнити баланс",
         "topup_enter_amount": "💳 <b>Поповнення балансу</b>\n\nВведіть суму поповнення в PLN (від {min} до {max} PLN):",
@@ -1617,8 +1650,23 @@ TEXTS: dict[str, dict[str, str]] = {
         "cabinet_title": "💼 Особистий кабінет",
         "cabinet_balance": "💰 Баланс: <b>{balance} PLN</b>",
         "cabinet_level": "⭐ Рівень: <b>{level}</b>",
-        "cabinet_next_level": "📈 До рівня {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level": (
+            "📈 До наступного рівня необхідно зробити виграшних ставок на: <b>{amount} PLN</b>"
+        ),
         "cabinet_next_level_max": "📈 Наступний рівень: <b>максимальний рівень досягнуто</b>",
+        "btn_cabinet_levels_info": "ℹ️ Інформація рівнів",
+        "cabinet_levels_info_title": "ℹ️ <b>Інформація рівнів</b>",
+        "cabinet_levels_info_empty": "Активні рівні поки не налаштовані.",
+        "cabinet_levels_info_block": (
+            "<b>Рівень {level}</b>{current}{title}\n\n"
+            "📋 <b>Умова:</b>\n"
+            "• Сума виграних ставок: <b>{required} PLN</b>\n\n"
+            "🎁 <b>Нагороди:</b>\n"
+            "• На баланс: <b>{reward} PLN</b>\n"
+            "• Знижка на комісію виводу: <b>{withdraw}</b>\n"
+            "• Бонус до реферального %: <b>{referral}</b>"
+        ),
+        "cabinet_levels_info_current_mark": " · у вас",
         "cabinet_referral_link": "🔗 Ваше реферальне посилання:\n<code>{link}</code>",
         "btn_referral_program": "🤝 Реферальна програма",
         "btn_return_main": "повернутися на головну",
@@ -2285,8 +2333,9 @@ TEXTS: dict[str, dict[str, str]] = {
     "pl": {
         "choose_language": "Wybierz język / Choose language:",
         "welcome_menu": "Witamy w bocie do gier",
-        "welcome_user_id": "Twój ID: {user_id}",
+        "welcome_user_id": "🆔 Twój ID: <b>{user_id}</b>",
         "welcome_balance": "Twoje saldo: {balance} PLN",
+        "welcome_level": "Twój poziom: {level}",
         "btn_cabinet": "Konto osobiste",
         "btn_topup": "💳 Doładuj saldo",
         "topup_enter_amount": "💳 <b>Doładowanie salda</b>\n\nWprowadź kwotę doładowania w PLN (od {min} do {max} PLN):",
@@ -2356,8 +2405,23 @@ TEXTS: dict[str, dict[str, str]] = {
         "cabinet_title": "💼 Konto osobiste",
         "cabinet_balance": "💰 Saldo: <b>{balance} PLN</b>",
         "cabinet_level": "⭐ Poziom: <b>{level}</b>",
-        "cabinet_next_level": "📈 Do poziomu {level}: <b>{amount} PLN</b>",
+        "cabinet_next_level": (
+            "📈 Do następnego poziomu trzeba zrobić wygrywających zakładów na: <b>{amount} PLN</b>"
+        ),
         "cabinet_next_level_max": "📈 Następny poziom: <b>osiągnięto maksymalny poziom</b>",
+        "btn_cabinet_levels_info": "ℹ️ Informacja o poziomach",
+        "cabinet_levels_info_title": "ℹ️ <b>Informacja o poziomach</b>",
+        "cabinet_levels_info_empty": "Brak aktywnych poziomów.",
+        "cabinet_levels_info_block": (
+            "<b>Poziom {level}</b>{current}{title}\n\n"
+            "📋 <b>Warunek:</b>\n"
+            "• Suma wygranych zakładów: <b>{required} PLN</b>\n\n"
+            "🎁 <b>Nagrody:</b>\n"
+            "• Na saldo: <b>{reward} PLN</b>\n"
+            "• Zniżka prowizji wypłaty: <b>{withdraw}</b>\n"
+            "• Bonus do % poleceń: <b>{referral}</b>"
+        ),
+        "cabinet_levels_info_current_mark": " · Twój",
         "cabinet_referral_link": "🔗 Twój link polecający:\n<code>{link}</code>",
         "btn_referral_program": "🤝 Program poleceń",
         "btn_return_main": "powrót do menu głównego",

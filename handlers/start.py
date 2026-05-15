@@ -52,7 +52,9 @@ async def cmd_start(message: Message, session: AsyncSession, user: User) -> None
     show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await message.answer(
-        build_welcome_text(user.language_code, user.user_id, user.balance),
+        build_welcome_text(
+            user.language_code, user.user_id, user.balance, user.level or 0
+        ),
         reply_markup=main_menu_keyboard(
             user.language_code,
             user.user_id,
@@ -84,7 +86,7 @@ async def on_language_chosen(
     show_kmb = await app_chats_repo.any_kmb_enabled(session)
     show_slot = await slot_repo.is_enabled(session)
     await callback.message.edit_text(
-        build_welcome_text(code, user.user_id, user.balance),
+        build_welcome_text(code, user.user_id, user.balance, user.level or 0),
         reply_markup=main_menu_keyboard(
             code,
             user.user_id,
